@@ -32,7 +32,12 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     if event.message.text == '銀河':
-        message = TextSendMessage(text='大便')    
+        message = TextSendMessage(text='大便')   
+    if event.message.text == '妲黑':
+        message = ImageSendMessage(
+            original_content_url ='https://raw.githubusercontent.com/lkevin861018/line/main/img/dahate.png?token=GHSAT0AAAAAACQ2QNNJDXANZ47T2LSWRNLQZQXWECQ',
+            preview_image_url = 'https://raw.githubusercontent.com/lkevin861018/line/main/img/dahate.png?token=GHSAT0AAAAAACQ2QNNJDXANZ47T2LSWRNLQZQXWECQ'
+            )
     # else:
     #     message = TextSendMessage(text=event.message.text)
     line_bot_api.reply_message(event.reply_token, message)
