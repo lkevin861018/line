@@ -35,8 +35,8 @@ def handle_message(event):
         message = TextSendMessage(text='大便')   
     if event.message.text == '妲黑':
         message = ImageSendMessage(
-            original_content_url = r'https://raw.githubusercontent.com/lkevin861018/line/main/img/dahate.png',
-            preview_image_url = r'https://raw.githubusercontent.com/lkevin861018/line/main/img/dahate.png'
+            original_content_url = r'https://github.com/lkevin861018/line/blob/main/img/dahate.png',
+            preview_image_url = r'https://github.com/lkevin861018/line/blob/main/img/dahate.png'
             )
     # else:
     #     message = TextSendMessage(text=event.message.text)
