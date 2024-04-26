@@ -4,6 +4,7 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 import os
+import random as rd
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -37,6 +38,12 @@ def handle_message(event):
         message = ImageSendMessage(
             original_content_url = './/dahate.png',
             preview_image_url = './/dahate.png'
+            )
+    elif event.message.text == '抽':
+        random_num = rd.randint(1,60)
+        message = ImageSendMessage(
+            original_content_url = './/roll//%d.png'%random_num,
+            preview_image_url = './/roll//%d.png'%random_num
             )
     
     if message:
