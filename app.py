@@ -41,14 +41,14 @@ def handle_message(event):
         message = TextSendMessage(text='大便')   
     elif event.message.text == '妲黑':
         message = ImageSendMessage(
-            original_content_url = url+'/static/'+'dahate.png',
-            preview_image_url = url+'/static/'+'dahate.png'
+            original_content_url = url+'/static/dahate.png',
+            preview_image_url = url+'/static/dahate.png'
             )
     elif event.message.text == '抽':
         random_num = rd.randint(1,60)
         message = ImageSendMessage(
-            original_content_url = './/roll//%d.png'%random_num,
-            preview_image_url = './/roll//%d.png'%random_num
+            original_content_url = url+'/static/roll/%d.png'%random_num,
+            preview_image_url = url+'/static/roll/%d.png'%random_num
             )
     
     if message:
