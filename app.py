@@ -36,8 +36,8 @@ def handle_message(event):
         message = TextSendMessage(text='大便')   
     elif event.message.text == '妲黑':
         message = ImageSendMessage(
-            original_content_url = './/dahate.png',
-            preview_image_url = './/dahate.png'
+            original_content_url = './/img//dahate.png',
+            preview_image_url = './/img//dahate.png'
             )
     elif event.message.text == '抽':
         random_num = rd.randint(1,60)
