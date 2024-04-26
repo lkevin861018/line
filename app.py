@@ -10,7 +10,7 @@ load_dotenv()
 line_token = os.getenv('line_token')
 line_secret = os.getenv('line_secret')
 
-app = Flask(__name__)
+app = Flask(__name__,static_folder='img',static_url_path='/')
 
 # line_bot_api = LineBotApi(os.environ['line_token'])
 # handler = WebhookHandler(os.environ['line_secret'])
@@ -33,14 +33,14 @@ def callback():
 def handle_message(event):
     if event.message.text == '銀河':
         message = TextSendMessage(text='大便')   
-    if event.message.text == '妲黑':
+    elif event.message.text == '妲黑':
         message = ImageSendMessage(
-            original_content_url = r'https://raw.githubusercontent.com/lkevin861018/line/main/img/dahate.png',
-            preview_image_url = r'https://raw.githubusercontent.com/lkevin861018/line/main/img/dahate.png'
+            original_content_url = './/dahate.png',
+            preview_image_url = './/dahate.png'
             )
-    # else:
-    #     message = TextSendMessage(text=event.message.text)
-    line_bot_api.reply_message(event.reply_token, message)
+    
+    if message:
+        line_bot_api.reply_message(event.reply_token, message)
 
 import os
 if __name__ == "__main__":
