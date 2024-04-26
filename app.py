@@ -11,13 +11,17 @@ load_dotenv()
 line_token = os.getenv('line_token')
 line_secret = os.getenv('line_secret')
 
-app = Flask(__name__,static_folder='img',static_url_path='/')
+app = Flask(__name__)
 
 # line_bot_api = LineBotApi(os.environ['line_token'])
 # handler = WebhookHandler(os.environ['line_secret'])
 line_bot_api = LineBotApi(line_token)
 handler = WebhookHandler(line_secret)
 
+
+@app.route('/index',methods = ['GET','POST'])
+def index():
+    return 'Hello World!!'
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -32,12 +36,13 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    url = 'https://linegg.onrender.com'
     if event.message.text == '銀河':
         message = TextSendMessage(text='大便')   
     elif event.message.text == '妲黑':
         message = ImageSendMessage(
-            original_content_url = './/img//dahate.png',
-            preview_image_url = './/img//dahate.png'
+            original_content_url = url+'/static/'+'dahate.png',
+            preview_image_url = url+'/static/'+'dahate.png'
             )
     elif event.message.text == '抽':
         random_num = rd.randint(1,60)
