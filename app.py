@@ -52,14 +52,20 @@ def handle_message(event):
             preview_image_url = url+'/static/roll/%d.png'%random_num
             )
     
+###########################################################################
 
     if event.message.text.find('!匯率'):
         message = TextSendMessage(
-            dollar.dollar(event.message.text.find('!匯率').split(' ')[1])
+            dollar.dollar(event.message.text.split(' ')[1])
         )
+
+###########################################################################
+
     if message:
         line_bot_api.reply_message(event.reply_token, message)
 
 import os
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug = False)
+    
+    
