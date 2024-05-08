@@ -6,6 +6,7 @@ from linebot.models import *
 import os
 import random as rd
 from dotenv import load_dotenv
+import dollar
 
 load_dotenv()
 line_token = os.getenv('line_token')
@@ -51,6 +52,11 @@ def handle_message(event):
             preview_image_url = url+'/static/roll/%d.png'%random_num
             )
     
+
+    if event.message.text.find('!匯率'):
+        message = TextSendMessage(
+            dollar.dollar(event.message.text.find('!匯率').split(' ')[1])
+        )
     if message:
         line_bot_api.reply_message(event.reply_token, message)
 
