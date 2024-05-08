@@ -54,7 +54,7 @@ def handle_message(event):
     
 ###########################################################################
 
-    if event.message.text.find('!匯率'):
+    if event.message.text.find('!匯率') == 0:
         message = TextSendMessage(
             dollar.dollar(event.message.text.split(' ')[1])
         )
