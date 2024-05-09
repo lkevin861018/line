@@ -55,12 +55,12 @@ def handle_message(event):
 ###########################################################################
 
     
-    if event.message.text.find('!匯率') == 0:
+    if event.message.text.find('!匯率') == 0 or event.message.text.find('！匯率') == 0:
         message = TextSendMessage(
             dollar.dollar(event.message.text.split(' ')[1])
         )
 
-    if event.message.text.find('!台股') == 0:
+    if event.message.text.find('!台股') == 0 or event.message.text.find('！台股') == 0:
         message = TextSendMessage(
             dollar.stock(event.message.text.split(' ')[1])
         )    
