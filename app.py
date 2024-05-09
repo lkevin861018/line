@@ -48,8 +48,8 @@ def handle_message(event):
     elif event.message.text == '凸':
         random_num = rd.randint(1,2)
         message = ImageSendMessage(
-            original_content_url = url+'/static/fk/%d.jpg'%random_num,
-            preview_image_url = url+'/static/fk/%d.jpg'%random_num
+            original_content_url = url+'/static/fk/%d.png'%random_num,
+            preview_image_url = url+'/static/fk/%d.png'%random_num
             )
     elif event.message.text == '抽':
         random_num = rd.randint(1,61)
