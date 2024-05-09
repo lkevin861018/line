@@ -46,12 +46,13 @@ def handle_message(event):
             preview_image_url = url+'/static/dahate.png'
             )
     elif event.message.text == '凸':
+        random_num = rd.randint(1,2)
         message = ImageSendMessage(
-            original_content_url = url+'/static/fk.jpg',
-            preview_image_url = url+'/static/fk.jpg'
+            original_content_url = url+'/static/fk/%d.jpg'%random_num,
+            preview_image_url = url+'/static/fk/%d.jpg'%random_num
             )
     elif event.message.text == '抽':
-        random_num = rd.randint(1,60)
+        random_num = rd.randint(1,61)
         message = ImageSendMessage(
             original_content_url = url+'/static/roll/%d.png'%random_num,
             preview_image_url = url+'/static/roll/%d.png'%random_num
