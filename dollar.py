@@ -35,9 +35,9 @@ def stock(no):
     ele1 = soup1.find('div', id='main')
     price1 = ele1.find('span',class_ = 'IsqQVc NprOob wT3VGc')
 
-    if ele:
+    if price:
         return(f'目前 1 股 {no} 為 {price.text}')
-    elif ele1:
+    elif price1:
         return(f'目前 1 股 {no} 為 {price1.text}')
     else:
         return('換一家試試')
