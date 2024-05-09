@@ -45,6 +45,11 @@ def handle_message(event):
             original_content_url = url+'/static/dahate.png',
             preview_image_url = url+'/static/dahate.png'
             )
+    elif event.message.text == '凸':
+        message = ImageSendMessage(
+            original_content_url = url+'/static/fk.jpg',
+            preview_image_url = url+'/static/fk.jpg'
+            )
     elif event.message.text == '抽':
         random_num = rd.randint(1,60)
         message = ImageSendMessage(
@@ -66,6 +71,9 @@ def handle_message(event):
         )    
 
 ###########################################################################
+
+    if event.message.text == '!指令':
+        message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n')   
 
     if message:
         line_bot_api.reply_message(event.reply_token, message)
