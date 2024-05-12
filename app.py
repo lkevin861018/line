@@ -57,6 +57,8 @@ def handle_message(event):
             original_content_url = url+'/static/roll/%d.png'%random_num,
             preview_image_url = url+'/static/roll/%d.png'%random_num
             )
+    elif event.message.text.find('消夜') or event.message.text.find('宵夜'):
+        message = TextSendMessage('麥當勞辣味雞塊')
     
 ###########################################################################
 
