@@ -52,13 +52,15 @@ def handle_message(event):
             preview_image_url = url+'/static/fk/fk%d.jpg'%random_num
             )
     elif event.message.text == '抽':
-        random_num = rd.randint(1,61)
+        random_num = rd.randint(1,63)
         message = ImageSendMessage(
             original_content_url = url+'/static/roll/%d.png'%random_num,
             preview_image_url = url+'/static/roll/%d.png'%random_num
             )
     elif event.message.text.find('消夜') >= 0 or event.message.text.find('宵夜') >= 0:
         message = TextSendMessage('麥當勞辣味雞塊')
+    elif event.message.text == '開台啦':
+        message = TextSendMessage('各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕')
     
 ###########################################################################
 
@@ -76,7 +78,7 @@ def handle_message(event):
 ###########################################################################
 
     if event.message.text == '!指令':
-        message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n')   
+        message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n')   
 
     if message:
         line_bot_api.reply_message(event.reply_token, message)
