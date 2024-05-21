@@ -87,7 +87,7 @@ def handle_message(event):
     ###########################################################################
 
     if isinstance(event.message, ImageMessage):
-        static_upload_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
+        static_upload_path = os.path.join(os.path.dirname(__file__), 'static', 'upload')
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
         with tempfile.NamedTemporaryFile(dir=static_upload_path, prefix=ext + '-', delete=False) as tf:
@@ -99,7 +99,7 @@ def handle_message(event):
         dist_name = os.path.basename(dist_path)
         os.rename(tempfile_path, dist_path)
         try:
-            path = os.path.join('static', 'tmp', dist_name)
+            path = os.path.join('static', 'upload', dist_name)
             print(path)
             line_bot_api.reply_message(
                 event.reply_token,
