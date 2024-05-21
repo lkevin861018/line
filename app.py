@@ -62,6 +62,8 @@ def handle_message(event):
             message = TextSendMessage('麥當勞辣味雞塊')
         elif event.message.text == '開台啦':
             message = TextSendMessage('各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕')
+        elif event.message.text == '157':
+            message = TextSendMessage('@恩💋妲 익은 Annie')
         
     ###########################################################################
 
@@ -78,36 +80,36 @@ def handle_message(event):
 
     ###########################################################################
 
-        if event.message.text == '!指令':
-            message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n')   
+        if event.message.text == 'GG人':
+            message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n開台啦\n157\n')   
 
         if message:
             line_bot_api.reply_message(event.reply_token, message)
 
     ###########################################################################
 
-    if isinstance(event.message, ImageMessage):
-        static_upload_path = os.path.join(os.path.dirname(__file__), 'static', 'upload')
-        ext = 'jpg'
-        message_content = line_bot_api.get_message_content(event.message.id)
-        with tempfile.NamedTemporaryFile(dir=static_upload_path, prefix=ext + '-', delete=False) as tf:
-            for chunk in message_content.iter_content():
-                tf.write(chunk)
-            tempfile_path = tf.name
+    # if isinstance(event.message, ImageMessage):
+    #     static_upload_path = os.path.join(os.path.dirname(__file__), 'static', 'upload')
+    #     ext = 'jpg'
+    #     message_content = line_bot_api.get_message_content(event.message.id)
+    #     with tempfile.NamedTemporaryFile(dir=static_upload_path, prefix=ext + '-', delete=False) as tf:
+    #         for chunk in message_content.iter_content():
+    #             tf.write(chunk)
+    #         tempfile_path = tf.name
 
-        dist_path = tempfile_path + '.' + ext
-        dist_name = os.path.basename(dist_path)
-        os.rename(tempfile_path, dist_path)
-        try:
-            path = os.path.join('static', 'upload', dist_name)
-            print(path)
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳成功'))
-        except:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳失敗'))
+    #     dist_path = tempfile_path + '.' + ext
+    #     dist_name = os.path.basename(dist_path)
+    #     os.rename(tempfile_path, dist_path)
+    #     try:
+    #         path = os.path.join('static', 'upload', dist_name)
+    #         print(path)
+    #         line_bot_api.reply_message(
+    #             event.reply_token,
+    #             TextSendMessage(text='上傳成功'))
+    #     except:
+    #         line_bot_api.reply_message(
+    #             event.reply_token,
+    #             TextSendMessage(text='上傳失敗'))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug = False)
