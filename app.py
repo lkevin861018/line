@@ -6,7 +6,7 @@ from linebot.models import *
 import os,tempfile
 import random as rd
 from dotenv import load_dotenv
-import dollar
+import dollar,translator
 
 load_dotenv()
 line_token = os.getenv('line_token')
@@ -77,6 +77,13 @@ def handle_message(event):
             message = TextSendMessage(
                 dollar.stock(event.message.text.split(' ')[1])
             )    
+        
+        if event.message.text.find('@') == 0:
+            txt = event.message.text.split(' ')[1]
+            lang = event.message.text.split(' ')[0].split('@')[1]  
+            message = TextSendMessage(
+                translator.trans(txt = txt,lang = lang)
+            ) 
 
     ###########################################################################
 
