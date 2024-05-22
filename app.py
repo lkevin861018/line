@@ -79,7 +79,7 @@ def handle_message(event):
             )    
         
         if event.message.text.find('#') == 0:
-            txtb = re.findall('#{1}\S*\s{1}',txt)[0]
+            txtb = re.findall('#{1}\S*\s{1}',event.message.text)[0]
             txt = event.message.text.split(txtb)[1]
             lang = event.message.text.split(' ')[0].split('#')[1]  
             message = TextSendMessage(
