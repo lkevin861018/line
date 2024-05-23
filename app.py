@@ -3,10 +3,9 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
-import os,re
+import os,re,dollar,translator,food
 import random as rd
 from dotenv import load_dotenv
-import dollar,translator
 
 load_dotenv()
 line_token = os.getenv('line_token')
@@ -85,6 +84,9 @@ def handle_message(event):
             message = TextSendMessage(
                 translator.trans(txt = txt,lang = lang)
             ) 
+        
+        if event.message.text == '喝啥':
+            message = TextSendMessage(food.what_to_drink())
 
     ###########################################################################
 
