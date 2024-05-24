@@ -99,8 +99,8 @@ def handle_message(event):
         if event.message.text == 'GG人':
             message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n開台啦\n157\n')   
 
-        if message:
-            line_bot_api.reply_message(event.reply_token, message)
+        # if message:
+        #     line_bot_api.reply_message(event.reply_token, message)
 
     ###########################################################################
 
