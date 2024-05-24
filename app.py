@@ -88,7 +88,7 @@ def handle_message(event):
        
         if event.message.text.find('@GG人畫圖') == 0:
             req = event.message.text.split('@GG人畫圖 ')[1]
-            img_url = ggopenai.cgpt(req = req)
+            img_url = ggopenai.igpt(req = req)
             message = ImageSendMessage(
             original_content_url = img_url,
             preview_image_url = img_url
@@ -133,6 +133,7 @@ def handle_message(event):
     #             TextSendMessage(text='上傳失敗'))
 
     try:
+        print(event.message.text)
         if message:
             line_bot_api.reply_message(event.reply_token, message)
     except:
