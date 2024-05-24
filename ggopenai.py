@@ -2,11 +2,7 @@ from openai import OpenAI
 import os
 
 client = OpenAI(api_key=os.getenv('chatgpt_api_key'))
-
-
-messages=[{
-    "role": "user",
-    "content": "Say this is a test",}]
+messages=[]
 
 def cgpt(ask):
     messages.append({"role": "user", "content": ask},)
