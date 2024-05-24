@@ -3,10 +3,10 @@ import os
 
 client = OpenAI(api_key=os.getenv('chatgpt_api_key'))
 
-if messages == None:
-    messages=[{
-        "role": "user",
-        "content": "Say this is a test",}]
+
+messages=[{
+    "role": "user",
+    "content": "Say this is a test",}]
 
 def cgpt(ask):
     message = input(ask)

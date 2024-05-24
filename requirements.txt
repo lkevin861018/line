@@ -19,7 +19,6 @@ fake-useragent==1.5.1
 Flask==3.0.3
 frozenlist==1.4.1
 future==1.0.0
-googletrans==4.0.0rc1
 h11==0.9.0
 h2==3.2.0
 hpack==3.0.0
