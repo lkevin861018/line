@@ -3,7 +3,7 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
-import os,re,dollar,translator,food,openai
+import os,re,dollar,food,openai
 import random as rd
 from dotenv import load_dotenv
 
