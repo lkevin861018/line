@@ -85,8 +85,8 @@ def handle_message(event):
         #         translator.trans(txt = txt,lang = lang)
         #     ) 
         
-        if event.message.text.find('$gpt') == 0:
-            ask = event.message.text.split('$gpt ')[1]
+        if event.message.text.find('@GG人') == 0:
+            ask = event.message.text.split('@GG人 ')[1]
             message = TextSendMessage(
                 ggopenai.cgpt(ask = ask)
             ) 

@@ -9,8 +9,7 @@ messages=[{
     "content": "Say this is a test",}]
 
 def cgpt(ask):
-    message = input(ask)
-    messages.append({"role": "user", "content": message},)
+    messages.append({"role": "user", "content": ask},)
     chat_completion = client.chat.completions.create(
         messages = messages,
         model="gpt-3.5-turbo-16k",)
