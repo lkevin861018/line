@@ -86,7 +86,7 @@ def handle_message(event):
         #     ) 
         
         if event.message.text.find('$gpt') == 0:
-            ask = event.message.text.split('$gpt\s')[1]
+            ask = event.message.text.split('$gpt ')[1]
             message = TextSendMessage(
                 ggopenai.cgpt(ask = ask)
             ) 
