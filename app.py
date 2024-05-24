@@ -4,6 +4,7 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 import os,re,dollar,food,ggopenai
+from openai import BadRequestError
 import random as rd
 from dotenv import load_dotenv
 
@@ -88,11 +89,14 @@ def handle_message(event):
        
         if event.message.text.find('@GG人畫圖') == 0:
             req = event.message.text.split('@GG人畫圖 ')[1]
-            img_url = ggopenai.igpt(req = req)
-            message = ImageSendMessage(
-            original_content_url = img_url,
-            preview_image_url = img_url
-            )
+            try:
+                img_url = ggopenai.igpt(req = req)
+                message = ImageSendMessage(
+                original_content_url = img_url,
+                preview_image_url = img_url
+                )
+            except BadRequestError:
+                message = TextSendMessage('我是政確的狗汪汪!')
         elif event.message.text.find('@GG人') == 0:
             ask = event.message.text.split('@GG人 ')[1]
             message = TextSendMessage(
