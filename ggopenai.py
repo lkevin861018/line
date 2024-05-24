@@ -1,4 +1,4 @@
-from ggopenai import OpenAI
+from openai import OpenAI
 import os
 
 client = OpenAI(api_key=os.getenv('chatgpt_api_key'))
