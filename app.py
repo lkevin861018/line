@@ -3,7 +3,7 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
-import os,re,dollar,food,openai
+import os,re,dollar,food,ggopenai
 import random as rd
 from dotenv import load_dotenv
 
@@ -88,7 +88,7 @@ def handle_message(event):
         if event.message.text.find('$gpt') == 0:
             ask = event.message.text.split('$gpt\s')[1]
             message = TextSendMessage(
-                openai.cgpt(ask = ask)
+                ggopenai.cgpt(ask = ask)
             ) 
 
         if event.message.text == '喝啥':
