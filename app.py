@@ -85,17 +85,18 @@ def handle_message(event):
         #         translator.trans(txt = txt,lang = lang)
         #     ) 
         
-        if event.message.text.find('@GG人') == 0:
-            ask = event.message.text.split('@GG人 ')[1]
-            message = TextSendMessage(
-                ggopenai.cgpt(ask = ask)
-            )
-        elif event.message.text.find('@GG人畫圖') == 0:
+       
+        if event.message.text.find('@GG人畫圖') == 0:
             img = event.message.text.split('@GG人畫圖 ')[1]
             img_url = ggopenai.cgpt(img = img)
             message = ImageSendMessage(
             original_content_url = img_url,
             preview_image_url = img_url
+            )
+        elif event.message.text.find('@GG人') == 0:
+            ask = event.message.text.split('@GG人 ')[1]
+            message = TextSendMessage(
+                ggopenai.cgpt(ask = ask)
             )
             
         if event.message.text == '喝啥':
