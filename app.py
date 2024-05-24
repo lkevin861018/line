@@ -89,8 +89,15 @@ def handle_message(event):
             ask = event.message.text.split('@GG人 ')[1]
             message = TextSendMessage(
                 ggopenai.cgpt(ask = ask)
-            ) 
-
+            )
+        elif event.message.text.find('@GG人畫圖') == 0:
+            img = event.message.text.split('@GG人畫圖 ')[1]
+            img_url = ggopenai.cgpt(img = img)
+            message = ImageSendMessage(
+            original_content_url = img_url,
+            preview_image_url = img_url
+            )
+            
         if event.message.text == '喝啥':
             message = TextSendMessage(food.what_to_drink())
 
