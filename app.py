@@ -87,8 +87,8 @@ def handle_message(event):
         
        
         if event.message.text.find('@GG人畫圖') == 0:
-            img = event.message.text.split('@GG人畫圖 ')[1]
-            img_url = ggopenai.cgpt(img = img)
+            req = event.message.text.split('@GG人畫圖 ')[1]
+            img_url = ggopenai.cgpt(req = req)
             message = ImageSendMessage(
             original_content_url = img_url,
             preview_image_url = img_url
