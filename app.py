@@ -124,8 +124,11 @@ def handle_message(event):
     #             event.reply_token,
     #             TextSendMessage(text='上傳失敗'))
 
-    if message:
-        line_bot_api.reply_message(event.reply_token, message)
+    try:
+        if message:
+            line_bot_api.reply_message(event.reply_token, message)
+    except:
+        pass
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug = False)
