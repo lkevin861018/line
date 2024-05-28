@@ -97,10 +97,15 @@ def handle_message(event):
                 )
             except BadRequestError:
                 message = TextSendMessage('我是政確的狗汪汪!')
+        elif event.message.text.find('@GG人4') == 0:
+            ask = event.message.text.split('@GG人4 ')[1]
+            message = TextSendMessage(
+                ggopenai.cgpt(ask = ask,gen = "gpt-4o-2024-05-13")
+            )
         elif event.message.text.find('@GG人') == 0:
             ask = event.message.text.split('@GG人 ')[1]
             message = TextSendMessage(
-                ggopenai.cgpt(ask = ask)
+                ggopenai.cgpt(ask = ask,gen = "gpt-3.5-turbo-16k")
             )
             
         if event.message.text == '喝啥':
