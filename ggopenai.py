@@ -8,7 +8,8 @@ def cgpt(ask):
     messages.append({"role": "user", "content": ask},)
     chat_completion = client.chat.completions.create(
         messages = messages,
-        model="gpt-3.5-turbo-16k",)
+        # model="gpt-3.5-turbo-16k",)
+        model="gpt-4o-2024-05-13",)
     answer = chat_completion.choices[0].message.content
     messages.append({"role": "assistant", "content": answer})
     return answer
