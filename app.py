@@ -68,12 +68,14 @@ def da():
     
     response = requests.get(url, headers=headers, params=params)
     if response.json()['data']!=[] and stream_status == True:
+        print('開')
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
         return ''
     elif response.json()['data']==[] and stream_status == False:
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='關台啦!'))
+        print('關')
         return 1
     else:
         return stream_status
@@ -199,5 +201,6 @@ def periodic_task():
         params = {"stream_status": stream_status}
         da_res = requests.get(da_url,params=params).text
         stream_status = bool(da_res)
+        print(stream_status)
         time.sleep(3)
         # print(da_res.status_code)
