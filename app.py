@@ -52,22 +52,29 @@ def callback():
         abort(400)
     return 'OK'
 
+
+stream_status = True
 @app.route('/da',methods = ['GET'])
 def da():
     url = 'https://api.twitch.tv/helix/streams'
-    params = {
-        "user_login": "dada_0124"
-    }
+    params = {"user_login": "dada_0124"}
     headers = {
         'Authorization': 'Bearer '+twitch_user_key,
         'Client-Id': twitch_client_id
     }
 
     response = requests.get(url, headers=headers, params=params)
-
-    # If you want to print the response
-    print(response.json())
-    print(response.status_code)
+    if response.json()['data']!=[] and stream_status:
+        line_bot_api.push_message(group_id, 
+                                  TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
+        global stream_status
+        stream_status = False
+    elif response.json()['data']==[] and stream_status == False:
+        line_bot_api.push_message(group_id, 
+                                  TextSendMessage(text='關台啦!'))
+    else:
+        pass
+    return 
 
 
 @handler.add(MessageEvent, message=(TextMessage,ImageMessage))
@@ -185,35 +192,20 @@ def handle_message(event):
 
 
 def periodic_task():
-    while True:
-        wakeup_url = 'https://linegg.onrender.com/index'
-        wakeup_res = requests.get(wakeup_url)
-        print('linegg status code:', wakeup_res.status_code)
-        time.sleep(10)
+    def wake():
+        while True:
+            wakeup_url = 'https://linegg.onrender.com/index'
+            wakeup_res = requests.get(wakeup_url)
+            # print('linegg status code:', wakeup_res.status_code)
+            time.sleep(600)
+
+    def da_stream():
         da_url = 'https://linegg.onrender.com/da'
         da_res = requests.get(da_url)
-        print(da_res.status_code)
+        # print(da_res.status_code)
 
-# if __name__ == "__main__":
-#     def aa():
-#         app.run(host='0.0.0.0', debug = False)
-    
-#     def bb():
-#         # 叫醒render
-#         while 1:
-#             # try:
-#             wakeup_url = 'https://linegg.onrender.com/index'
-#             wakeup_res = requests.get(wakeup_url)
-#             print('linegg status code:',wakeup_res.status_code)
-#             time.sleep(10)
-#             # except:
-#             #     pass
-#             da_url = 'https://linegg.onrender.com/da'
-#             da_res = requests.get(da_url)
-#             print(da_res.status_code)
-    
-#     a = threading.Thread(target=aa)
-#     b = threading.Thread(target=bb)
+    wake_thread = threading.Thread(target=wake)
+    da_stream_thread = threading.Thread(target=da_stream)
 
-#     a.start()
-#     b.start()
+    wake_thread.start()
+    da_stream_thread.start()
