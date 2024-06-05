@@ -200,8 +200,10 @@ def periodic_task():
             time.sleep(600)
 
     def da_stream():
-        da_url = 'https://linegg.onrender.com/da'
-        da_res = requests.get(da_url)
+        while True:
+            da_url = 'https://linegg.onrender.com/da'
+            da_res = requests.get(da_url)
+            time.sleep(1)
         # print(da_res.status_code)
 
     wake_thread = threading.Thread(target=wake)
