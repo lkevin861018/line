@@ -55,7 +55,8 @@ def callback():
 
 
 @app.route('/da',methods = ['GET'])
-def da(stream_status):
+def da():
+    stream_status = request.args.get('stream_status')
     url = 'https://api.twitch.tv/helix/streams'
     params = {"user_login": "dada_0124"}
     headers = {
