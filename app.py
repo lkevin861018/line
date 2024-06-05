@@ -197,10 +197,10 @@ def handle_message(event):
 def periodic_task():
     stream_status = True
     while True:
-        da_url = 'https://linegg.onrender.com/da'
-        params = {"stream_status": stream_status}
-        da_res = requests.get(da_url,params=params).text
-        stream_status = bool(da_res)
-        print(stream_status)
+        # da_url = 'https://linegg.onrender.com/da'
+        # params = {"stream_status": stream_status}
+        # da_res = requests.get(da_url,params=params).text
+        # stream_status = bool(da_res)
+        # print(stream_status)
         time.sleep(3)
         # print(da_res.status_code)
