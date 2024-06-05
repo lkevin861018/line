@@ -183,26 +183,37 @@ def handle_message(event):
     except:
         pass
 
-if __name__ == "__main__":
-    def aa():
-        app.run(host='0.0.0.0', debug = False)
-    
-    def bb():
-        # 叫醒render
-        while 1:
-            # try:
-            wakeup_url = 'https://linegg.onrender.com/index'
-            wakeup_res = requests.get(wakeup_url)
-            print('linegg status code:',wakeup_res.status_code)
-            time.sleep(10)
-            # except:
-            #     pass
-            da_url = 'https://linegg.onrender.com/da'
-            da_res = requests.get(da_url)
-            print(da_res.status_code)
-    
-    a = threading.Thread(target=aa)
-    b = threading.Thread(target=bb)
 
-    a.start()
-    b.start()
+def periodic_task():
+    while True:
+        wakeup_url = 'https://linegg.onrender.com/index'
+        wakeup_res = requests.get(wakeup_url)
+        print('linegg status code:', wakeup_res.status_code)
+        time.sleep(10)
+        da_url = 'https://linegg.onrender.com/da'
+        da_res = requests.get(da_url)
+        print(da_res.status_code)
+
+# if __name__ == "__main__":
+#     def aa():
+#         app.run(host='0.0.0.0', debug = False)
+    
+#     def bb():
+#         # 叫醒render
+#         while 1:
+#             # try:
+#             wakeup_url = 'https://linegg.onrender.com/index'
+#             wakeup_res = requests.get(wakeup_url)
+#             print('linegg status code:',wakeup_res.status_code)
+#             time.sleep(10)
+#             # except:
+#             #     pass
+#             da_url = 'https://linegg.onrender.com/da'
+#             da_res = requests.get(da_url)
+#             print(da_res.status_code)
+    
+#     a = threading.Thread(target=aa)
+#     b = threading.Thread(target=bb)
+
+#     a.start()
+#     b.start()
