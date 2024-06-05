@@ -29,6 +29,20 @@ def callback():
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
+
+    try:
+        events = json.loads(body).get('events', [])
+        for event in events:
+            if event['type'] == 'join':
+                group_id = event['source']['groupId']
+                print(f'Bot joined group: {group_id}')
+            elif event['type'] == 'message':
+                group_id = event['source'].get('groupId')
+                if group_id:
+                    print(f'Message from group: {group_id}')
+    except:
+        pass
+
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
@@ -143,6 +157,7 @@ def handle_message(event):
 
     try:
         print(event.message.text)
+        print(event.)
         if message:
             line_bot_api.reply_message(event.reply_token, message)
     except:
