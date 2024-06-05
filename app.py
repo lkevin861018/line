@@ -12,6 +12,9 @@ from dotenv import load_dotenv
 load_dotenv()
 line_token = os.getenv('line_token')
 line_secret = os.getenv('line_secret')
+group_id = os.getenv('group_id')
+twitch_user_key = os.getenv('twitch_user_key')
+twitch_client_id = os.getenv('twitch_client_id')
 
 app = Flask(__name__)
 
@@ -30,24 +33,42 @@ def callback():
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
 
-    try:
-        events = json.loads(body).get('events', [])
-        for event in events:
-            if event['type'] == 'join':
-                group_id = event['source']['groupId']
-                print(f'Bot joined group: {group_id}')
-            elif event['type'] == 'message':
-                group_id = event['source'].get('groupId')
-                if group_id:
-                    print(f'Message from group: {group_id}')
-    except:
-        pass
+    # try:
+    #     events = json.loads(body).get('events', [])
+    #     for event in events:
+    #         if event['type'] == 'join':
+    #             group_id = event['source']['groupId']
+    #             print(f'Bot joined group: {group_id}')
+    #         elif event['type'] == 'message':
+    #             group_id = event['source'].get('groupId')
+    #             if group_id:
+    #                 print(f'Message from group: {group_id}')
+    # except:
+    #     pass
 
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
     return 'OK'
+
+@app.route('/da',methods = ['GET'])
+def da():
+    url = 'https://api.twitch.tv/helix/streams'
+    params = {
+        "user_login": "dada_0124"
+    }
+    headers = {
+        'Authorization': 'Bearer '+twitch_user_key,
+        'Client-Id': twitch_client_id
+    }
+
+    response = requests.get(url, headers=headers, params=params)
+
+    # If you want to print the response
+    print(response.json())
+    print(response.status_code)
+
 
 @handler.add(MessageEvent, message=(TextMessage,ImageMessage))
 def handle_message(event):
@@ -169,13 +190,16 @@ if __name__ == "__main__":
     def bb():
         # 叫醒render
         while 1:
-            try:
-                wakeup_url = 'https://linegg.onrender.com/index'
-                wakeup_res = requests.get(wakeup_url)
-                print('linegg status code:',wakeup_res.status_code)
-                time.sleep(600)
-            except:
-                pass
+            # try:
+            wakeup_url = 'https://linegg.onrender.com/index'
+            wakeup_res = requests.get(wakeup_url)
+            print('linegg status code:',wakeup_res.status_code)
+            time.sleep(10)
+            # except:
+            #     pass
+            da_url = 'https://linegg.onrender.com/da'
+            da_res = requests.get(da_url)
+            print(da_res.status_code)
     
     a = threading.Thread(target=aa)
     b = threading.Thread(target=bb)
