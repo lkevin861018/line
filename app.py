@@ -161,7 +161,7 @@ if __name__ == "__main__":
                 print('linegg status code:',wakeup_res.status_code)
                 time.sleep(600)
             except:
-                break
+                pass
     
     a = threading.Thread(target=aa)
     b = threading.Thread(target=bb)
