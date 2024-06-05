@@ -64,7 +64,7 @@ def da():
     }
 
     response = requests.get(url, headers=headers, params=params)
-    if response.json()['data']!=[] and stream_status:
+    if response.json()['data']!=[] and stream_status == True:
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
         stream_status = False
@@ -191,22 +191,8 @@ def handle_message(event):
 
 
 def periodic_task():
-    def wake():
-        while True:
-            wakeup_url = 'https://linegg.onrender.com/index'
-            wakeup_res = requests.get(wakeup_url)
-            # print('linegg status code:', wakeup_res.status_code)
-            time.sleep(600)
-
-    def da_stream():
-        while True:
-            da_url = 'https://linegg.onrender.com/da'
-            da_res = requests.get(da_url)
-            time.sleep(1)
+    while True:
+        da_url = 'https://linegg.onrender.com/da'
+        da_res = requests.get(da_url)
+        time.sleep(1)
         # print(da_res.status_code)
-
-    wake_thread = threading.Thread(target=wake)
-    da_stream_thread = threading.Thread(target=da_stream)
-
-    wake_thread.start()
-    da_stream_thread.start()
