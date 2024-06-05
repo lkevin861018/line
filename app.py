@@ -58,7 +58,8 @@ def callback():
 def da():
     stream_status = request.args.get('stream_status')
     url = 'https://api.twitch.tv/helix/streams'
-    params = {"user_login": "dada_0124"}
+    # params = {"user_login": "dada_0124"}
+    params = {"user_login": "rhythmy861018"}
     headers = {
         'Authorization': 'Bearer '+twitch_user_key,
         'Client-Id': twitch_client_id
@@ -69,13 +70,13 @@ def da():
     if response.json()['data']!=[] and stream_status == True:
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
-        return 
+        return ''
     elif response.json()['data']==[] and stream_status == False:
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='關台啦!'))
         return 1
     else:
-        pass
+        return stream_status
      
 
 
@@ -104,8 +105,6 @@ def handle_message(event):
                 )
         elif event.message.text.find('消夜') >= 0 or event.message.text.find('宵夜') >= 0:
             message = TextSendMessage('麥當勞辣味雞塊')
-        elif event.message.text == '開台啦':
-            message = TextSendMessage('各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕')
         elif event.message.text == '157':
             message = TextSendMessage('@恩💋妲 익은 Annie')
         
@@ -158,7 +157,7 @@ def handle_message(event):
     ###########################################################################
 
         if event.message.text == 'GG人':
-            message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n開台啦\n157\n')   
+            message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n157\n')   
 
     ###########################################################################
 
@@ -200,5 +199,5 @@ def periodic_task():
         params = {"stream_status": stream_status}
         da_res = requests.get(da_url,params=params).text
         stream_status = bool(da_res)
-        time.sleep(1)
+        time.sleep(3)
         # print(da_res.status_code)
