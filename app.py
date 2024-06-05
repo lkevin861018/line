@@ -53,9 +53,9 @@ def callback():
     return 'OK'
 
 
-stream_status = True
+
 @app.route('/da',methods = ['GET'])
-def da():
+def da(stream_status):
     url = 'https://api.twitch.tv/helix/streams'
     params = {"user_login": "dada_0124"}
     headers = {
@@ -63,17 +63,19 @@ def da():
         'Client-Id': twitch_client_id
     }
 
+    
     response = requests.get(url, headers=headers, params=params)
     if response.json()['data']!=[] and stream_status == True:
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
-        stream_status = False
+        return 
     elif response.json()['data']==[] and stream_status == False:
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='關台啦!'))
+        return 1
     else:
         pass
-    return 
+     
 
 
 @handler.add(MessageEvent, message=(TextMessage,ImageMessage))
@@ -191,8 +193,11 @@ def handle_message(event):
 
 
 def periodic_task():
+    stream_status = True
     while True:
         da_url = 'https://linegg.onrender.com/da'
-        da_res = requests.get(da_url)
+        params = {"stream_status": stream_status}
+        da_res = requests.get(da_url,params=params).text
+        stream_status = bool(da_res)
         time.sleep(1)
         # print(da_res.status_code)
