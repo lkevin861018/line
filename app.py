@@ -3,7 +3,8 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
-import os,re,dollar,food,ggopenai
+import os,re,requests,time
+import dollar,food,ggopenai
 from openai import BadRequestError
 import random as rd
 from dotenv import load_dotenv
@@ -19,6 +20,15 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(line_token)
 handler = WebhookHandler(line_secret)
 
+# 叫醒render
+while 1:
+    try:
+        wakeup_url = 'https://linegg.onrender.com/index'
+        wakeup_res = requests.get(wakeup_url)
+        print('linegg status code:',wakeup_res.status_code)
+        time.sleep(600)
+    except:
+        break
 
 @app.route('/index',methods = ['GET','POST'])
 def index():
