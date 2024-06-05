@@ -157,7 +157,6 @@ def handle_message(event):
 
     try:
         print(event.message.text)
-        print(event.)
         if message:
             line_bot_api.reply_message(event.reply_token, message)
     except:
