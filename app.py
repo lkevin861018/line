@@ -67,7 +67,6 @@ def da():
     if response.json()['data']!=[] and stream_status:
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
-        global stream_status
         stream_status = False
     elif response.json()['data']==[] and stream_status == False:
         line_bot_api.push_message(group_id, 
