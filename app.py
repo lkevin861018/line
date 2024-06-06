@@ -67,23 +67,23 @@ def da():
 
     
     response = requests.get(url, headers=headers, params=params)
-    if response.json()['data']!=[] and stream_status == True:
-        print('開')
+    print(response.json()['data']!=[])
+    if response.json()['data']!=[] and stream_status == 'on':
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
-        return ''
-    elif response.json()['data']==[] and stream_status == False:
+        return 'off'
+    elif response.json()['data']==[] and stream_status == 'off':
         line_bot_api.push_message(group_id, 
                                   TextSendMessage(text='關台啦!'))
-        print('關')
-        return 1
+        return 'on'
     else:
         return stream_status
     
 @app.route('/test',methods = ['GET'])
 def test():
+    talk = request.args.get('talk')
     line_bot_api.push_message(group_id,
-                              TextSendMessage(text='你們好!這裡是台灣!'))
+                              TextSendMessage(text=talk))
     return 'push' 
 
 
@@ -200,12 +200,11 @@ def handle_message(event):
 
 
 def periodic_task():
-    stream_status = True
+    stream_status = 'on'
     while True:
-        # da_url = 'https://linegg.onrender.com/da'
-        # params = {"stream_status": stream_status}
-        # da_res = requests.get(da_url,params=params).text
-        # stream_status = bool(da_res)
+        da_url = 'https://linegg.onrender.com/da'
+        params = {"stream_status": stream_status}
+        stream_status = requests.get(da_url,params=params)
         # print(stream_status)
         time.sleep(3)
         # print(da_res.status_code)
