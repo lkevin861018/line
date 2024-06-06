@@ -69,17 +69,20 @@ def da():
     response = requests.get(url, headers=headers, params=params)
     print(stream_status)
     print(response.json()['data']!=[])
-    if response.json()['data']!=[] and stream_status == 'on':
-        line_bot_api.push_message(group_id, 
-                                #   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
-                                  TextSendMessage(text='開台測試'))
-        return 'off'
-    elif response.json()['data']==[] and stream_status == 'off':
-        line_bot_api.push_message(group_id, 
-                                  TextSendMessage(text='開台測試'))
+    try:
+        if response.json()['data']!=[] and stream_status == 'on':
+            line_bot_api.push_message(group_id, 
+                                    #   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
+                                    TextSendMessage(text='開台測試'))
+            return 'off'
+        elif response.json()['data']==[] and stream_status == 'off':
+            line_bot_api.push_message(group_id, 
+                                    TextSendMessage(text='開台測試'))
+            return 'on'
+        else:
+            return stream_status
+    except:
         return 'on'
-    else:
-        return stream_status
     
 @app.route('/ggtalk',methods = ['GET'])
 def ggtalk():
