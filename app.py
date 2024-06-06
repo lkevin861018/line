@@ -52,22 +52,12 @@ def callback():
         abort(400)
     return 'OK'
 
-def stream_on():
-    line_bot_api.push_message(group_id, 
-                              #   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
-                              TextSendMessage(text='開台測試'))
-    return
-def stream_off():
-    line_bot_api.push_message(group_id, 
-                              TextSendMessage(text='開台測試'))
-    return
-
 @app.route('/da',methods = ['GET'])
 def da():
     stream_status = request.args.get('stream_status')
     url = 'https://api.twitch.tv/helix/streams'
-    # params = {"user_login": "dada_0124"}
-    params = {"user_login": "rhythmy861018"}
+    params = {"user_login": "dada_0124"}
+    # params = {"user_login": "rhythmy861018"}
     headers = {
         'Authorization': 'Bearer '+twitch_user_key,
         'Client-Id': twitch_client_id
@@ -79,8 +69,12 @@ def da():
     print(response.json()['data']!=[])
 
     if response.json()['data']!=[] and stream_status == 'on':
+        line_bot_api.push_message(group_id, 
+                                  TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
         return 'off'
     elif response.json()['data']==[] and stream_status == 'off':
+        line_bot_api.push_message(group_id, 
+                                  TextSendMessage(text='各位妲寶，關台啦~回家洗洗睡!'))
         return 'on'
     else:
         return stream_status
@@ -124,6 +118,8 @@ def handle_message(event):
             message = TextSendMessage('麥當勞辣味雞塊')
         elif event.message.text == '157':
             message = TextSendMessage('@恩💋妲 익은 Annie')
+        elif event.message.text == '巧多多':
+            message = TextSendMessage('忘記帶傘了')
         
     ###########################################################################
 
@@ -215,7 +211,7 @@ def periodic_task():
         params = {"stream_status": stream_status}
         stream_status = requests.get(da_url,params=params)
         # print(stream_status)
-        time.sleep(3)
+        time.sleep(5)
         # print(da_res.status_code)
 
 # periodic_task()
