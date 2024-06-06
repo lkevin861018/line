@@ -79,7 +79,12 @@ def da():
         return 1
     else:
         return stream_status
-     
+    
+@app.route('/test',methods = ['GET'])
+def test():
+    line_bot_api.push_message(group_id,
+                              TextSendMessage(text='你們好!這裡是台灣!'))
+    return 'push' 
 
 
 @handler.add(MessageEvent, message=(TextMessage,ImageMessage))
