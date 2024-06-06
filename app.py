@@ -126,6 +126,11 @@ def handle_message(event):
                 original_content_url = url+'/static/audio/gua.ogg',
                 duration=300
                 )
+        elif event.message.text == '笑死':
+            message = AudioSendMessage(
+                original_content_url = url+'/static/audio/lmao.ogg',
+                duration=5000
+                )
         
     ###########################################################################
 
