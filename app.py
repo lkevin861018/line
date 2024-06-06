@@ -69,20 +69,19 @@ def da():
     response = requests.get(url, headers=headers, params=params)
     print(stream_status)
     print(response.json()['data']!=[])
-    try:
-        if response.json()['data']!=[] and stream_status == 'on':
-            line_bot_api.push_message(group_id, 
-                                    #   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
-                                    TextSendMessage(text='開台測試'))
-            return 'off'
-        elif response.json()['data']==[] and stream_status == 'off':
-            line_bot_api.push_message(group_id, 
-                                    TextSendMessage(text='開台測試'))
-            return 'on'
-        else:
-            return stream_status
-    except:
+
+    if response.json()['data']!=[] and stream_status == 'on':
+        line_bot_api.push_message(group_id, 
+                                  #   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
+                                  TextSendMessage(text='開台測試'))
+        return 'off'
+    elif response.json()['data']==[] and stream_status == 'off':
+        line_bot_api.push_message(group_id, 
+                                  TextSendMessage(text='開台測試'))
         return 'on'
+    else:
+        return stream_status
+
     
 @app.route('/ggtalk',methods = ['GET'])
 def ggtalk():
@@ -206,6 +205,14 @@ def handle_message(event):
     except:
         pass
 
+def periodic_task():
+    stream_status = 'on'
+    while True:
+        da_url = 'https://linegg.onrender.com/da'
+        params = {"stream_status": stream_status}
+        stream_status = requests.get(da_url,params=params)
+        # print(stream_status)
+        time.sleep(3)
+        # print(da_res.status_code)
 
-
-
+periodic_task()
