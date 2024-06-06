@@ -5,7 +5,7 @@ def periodic_task():
     while True:
         da_url = 'https://linegg.onrender.com/da'
         params = {"stream_status": stream_status}
-        stream_status = requests.get(da_url,params=params)
+        stream_status = requests.get(da_url,params=params).text
         # print(stream_status)
         time.sleep(3)
         # print(da_res.status_code)
