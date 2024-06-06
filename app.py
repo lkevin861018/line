@@ -215,4 +215,4 @@ def periodic_task():
         time.sleep(3)
         # print(da_res.status_code)
 
-periodic_task()
+# periodic_task()
