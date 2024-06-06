@@ -69,12 +69,12 @@ def da():
     # print(response.json()['data']!=[])
     try:
         if response.json()['data']!=[] and stream_status == 'on':
-            line_bot_api.push_message(group_id, 
-                                    TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
+            # line_bot_api.push_message(group_id, 
+            #                         TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
             return 'off'
         elif response.json()['data']==[] and stream_status == 'off':
-            line_bot_api.push_message(group_id, 
-                                    TextSendMessage(text='各位妲寶，關台啦~回家洗洗睡!'))
+            # line_bot_api.push_message(group_id, 
+            #                         TextSendMessage(text='各位妲寶，關台啦~回家洗洗睡!'))
             return 'on'
         else:
             return stream_status
@@ -121,6 +121,11 @@ def handle_message(event):
             message = TextSendMessage('@恩💋妲 익은 Annie')
         elif event.message.text == '巧多多':
             message = TextSendMessage('忘記帶傘了')
+        elif event.message.text == '呱呱':
+            message = AudioSendMessage(
+                original_content_url = url+'/static/audio/gua.ogg',
+                duration=300
+                )
         
     ###########################################################################
 
