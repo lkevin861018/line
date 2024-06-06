@@ -70,7 +70,8 @@ def da():
     print(response.json()['data']!=[])
     if response.json()['data']!=[] and stream_status == 'on':
         line_bot_api.push_message(group_id, 
-                                  TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
+                                #   TextSendMessage(text='各位妲寶，妲妲開台啦 https://www.twitch.tv/dada_0124 !💕💕'))
+                                  TextSendMessage(text='開台測試'))
         return 'off'
     elif response.json()['data']==[] and stream_status == 'off':
         line_bot_api.push_message(group_id, 
@@ -79,12 +80,15 @@ def da():
     else:
         return stream_status
     
-@app.route('/test',methods = ['GET'])
-def test():
-    talk = request.args.get('talk')
-    line_bot_api.push_message(group_id,
-                              TextSendMessage(text=talk))
-    return 'push' 
+@app.route('/ggtalk',methods = ['GET'])
+def ggtalk():
+    try:
+        talk = request.args.get('talk')
+        line_bot_api.push_message(group_id,
+                                TextSendMessage(text=talk))
+        return 'push done' 
+    except Error as e:
+        return e
 
 
 @handler.add(MessageEvent, message=(TextMessage,ImageMessage))
