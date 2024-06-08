@@ -47,6 +47,9 @@ def callback():
     #     pass
 
     try:
+        print(request.headers)
+        print(request.get_data)
+        print(request)
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
@@ -181,7 +184,7 @@ def handle_message(event):
     ###########################################################################
 
         if event.message.text == 'GG人':
-            message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n157\n')   
+            message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n157\n呱呱\n笑死\n')   
 
     ###########################################################################
 
@@ -217,12 +220,12 @@ def handle_message(event):
 
 def periodic_task():
     stream_status = 'on'
-    while True:
-        da_url = 'https://linegg.onrender.com/da'
-        params = {"stream_status": stream_status}
-        stream_status = requests.get(da_url,params=params)
-        # print(stream_status)
-        time.sleep(5)
-        # print(da_res.status_code)
+    # while True:
+    #     da_url = 'https://linegg.onrender.com/da'
+    #     params = {"stream_status": stream_status}
+    #     stream_status = requests.get(da_url,params=params)
+    #     # print(stream_status)
+    #     time.sleep(5)
+    #     # print(da_res.status_code)
 
 # periodic_task()
