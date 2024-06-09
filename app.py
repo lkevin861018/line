@@ -121,6 +121,8 @@ def handle_message(event):
             message = TextSendMessage('@恩💋妲 익은 Annie')
         elif event.message.text == '巧多多':
             message = TextSendMessage('忘記帶傘了')
+        elif event.message.text == '爛透了':
+            message = TextSendMessage('就是在說你')
         elif event.message.text == '呱呱':
             message = AudioSendMessage(
                 original_content_url = url+'/static/audio/gua.ogg',
