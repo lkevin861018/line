@@ -1,4 +1,4 @@
-import requests
+import requests,json,time
 from bs4 import BeautifulSoup
 
 def dollar(cointype):
@@ -41,3 +41,29 @@ def stock(no):
         return(f'目前 1 股 {no} 為 {price1.text}')
     else:
         return('換一家試試')
+    
+def stock_ex(target):
+    endpoint = 'http://mis.twse.com.tw/stock/api/getStockInfo.jsp'
+    # Add 1000 seconds for prevent time inaccuracy
+    timestamp = int(time.time() * 1000 + 1000000)
+    query_url = '{}?_={}&ex_ch=tse_{}.tw'.format(endpoint, timestamp, target)
+
+    req = requests.session()
+    req.get('http://mis.twse.com.tw/stock/index.jsp',
+            headers={'Accept-Language': 'zh-TW'})
+
+    response = req.get(query_url)
+    content = json.loads(response.text)
+    stock_data =[
+        content['msgArray'][0]['c'], # 股票代號
+        content['msgArray'][0]['n'], # 股票名稱
+        content['msgArray'][0]['t'], # 資料時間
+        content['msgArray'][0]['z'], # 最近成交價
+        content['msgArray'][0]['tv'], # 當盤成交量
+        content['msgArray'][0]['v'], # 當日累計成交量
+        content['msgArray'][0]['a'], # 最佳五檔賣出價格
+        content['msgArray'][0]['f'], # 最價五檔賣出數量
+        content['msgArray'][0]['b'], # 最佳五檔買入價格
+        content['msgArray'][0]['g'] # 最佳五檔買入數量
+    ]
+    return stock_data
