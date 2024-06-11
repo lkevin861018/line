@@ -144,21 +144,8 @@ def handle_message(event):
 
         if event.message.text.find('!股票') == 0 or event.message.text.find('！股票') == 0:
             target = event.message.text.split(' ')[1]
-            # rep = dollar.stock()
-            dt = dollar.stock_ex(target)
-            rep = f'''
-            股票代號:{dt[0]}\n
-            股票名稱:{dt[1]}\n
-            資料時間:{dt[2]}\n
-            最近成交價:{dt[3]}\n
-            當盤成交量:{dt[4]}\n
-            當日累計成交量:{dt[5]}\n
-            最佳五檔賣出價格:{dt[6]}\n
-            最價五檔賣出數量:{dt[7]}\n
-            最佳五檔買入價格:{dt[8]}\n
-            最佳五檔買入數量:{dt[9]}\n
-            '''
-
+            # rep = dollar.stock(target)
+            rep = dollar.stock_ex(target)
             message = TextSendMessage(
                 rep
             )
@@ -244,3 +231,4 @@ def periodic_task():
         # print(da_res.status_code)
 
 # periodic_task()
+
