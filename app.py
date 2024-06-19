@@ -33,18 +33,18 @@ def callback():
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
 
-    # try:
-    #     events = json.loads(body).get('events', [])
-    #     for event in events:
-    #         if event['type'] == 'join':
-    #             group_id = event['source']['groupId']
-    #             print(f'Bot joined group: {group_id}')
-    #         elif event['type'] == 'message':
-    #             group_id = event['source'].get('groupId')
-    #             if group_id:
-    #                 print(f'Message from group: {group_id}')
-    # except:
-    #     pass
+    try:
+        events = json.loads(body).get('events', [])
+        for event in events:
+            if event['type'] == 'join':
+                group_id = event['source']['userID']
+                print(f'Bot joined group: {group_id}')
+            elif event['type'] == 'message':
+                group_id = event['source'].get('userID')
+                if group_id:
+                    print(f'Message from group: {group_id}')
+    except:
+        pass
 
     try:
         handler.handle(body, signature)
