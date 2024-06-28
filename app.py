@@ -94,43 +94,43 @@ def ggtalk():
 def handle_message(event):
     if isinstance(event.message,TextMessage):
         url = 'https://linegg.onrender.com'
-        if event.message.text == '銀河':
-            message = TextSendMessage(text='大便')   
-        elif event.message.text == '妲黑':
-            message = ImageSendMessage(
-                original_content_url = url+'/static/dahate.png',
-                preview_image_url = url+'/static/dahate.png'
-                )
-        elif event.message.text == '凸':
-            random_num = rd.randint(1,2)
-            message = ImageSendMessage(
-                original_content_url = url+'/static/fk/fk%d.jpg'%random_num,
-                preview_image_url = url+'/static/fk/fk%d.jpg'%random_num
-                )
-        elif event.message.text == '抽':
-            random_num = rd.randint(1,63)
-            message = ImageSendMessage(
-                original_content_url = url+'/static/roll/%d.png'%random_num,
-                preview_image_url = url+'/static/roll/%d.png'%random_num
-                )
-        elif event.message.text.find('消夜') >= 0 or event.message.text.find('宵夜') >= 0:
-            message = TextSendMessage('麥當勞辣味雞塊')
-        elif event.message.text == '157':
-            message = TextSendMessage('@恩💋妲 익은 Annie')
-        elif event.message.text == '巧多多':
-            message = TextSendMessage('忘記帶傘了')
-        elif event.message.text == '爛透了':
-            message = TextSendMessage('就是在說你')
-        elif event.message.text == '呱呱':
-            message = AudioSendMessage(
-                original_content_url = url+'/static/audio/gua.ogg',
-                duration=300
-                )
-        elif event.message.text == '笑死':
-            message = AudioSendMessage(
-                original_content_url = url+'/static/audio/lmao.ogg',
-                duration=5000
-                )
+        # if event.message.text == '銀河':
+        #     message = TextSendMessage(text='大便')   
+        # elif event.message.text == '妲黑':
+        #     message = ImageSendMessage(
+        #         original_content_url = url+'/static/dahate.png',
+        #         preview_image_url = url+'/static/dahate.png'
+        #         )
+        # elif event.message.text == '凸':
+        #     random_num = rd.randint(1,2)
+        #     message = ImageSendMessage(
+        #         original_content_url = url+'/static/fk/fk%d.jpg'%random_num,
+        #         preview_image_url = url+'/static/fk/fk%d.jpg'%random_num
+        #         )
+        # elif event.message.text == '抽':
+        #     random_num = rd.randint(1,63)
+        #     message = ImageSendMessage(
+        #         original_content_url = url+'/static/roll/%d.png'%random_num,
+        #         preview_image_url = url+'/static/roll/%d.png'%random_num
+        #         )
+        # elif event.message.text.find('消夜') >= 0 or event.message.text.find('宵夜') >= 0:
+        #     message = TextSendMessage('麥當勞辣味雞塊')
+        # elif event.message.text == '157':
+        #     message = TextSendMessage('@恩💋妲 익은 Annie')
+        # elif event.message.text == '巧多多':
+        #     message = TextSendMessage('忘記帶傘了')
+        # elif event.message.text == '爛透了':
+        #     message = TextSendMessage('就是在說你')
+        # elif event.message.text == '呱呱':
+        #     message = AudioSendMessage(
+        #         original_content_url = url+'/static/audio/gua.ogg',
+        #         duration=300
+        #         )
+        # elif event.message.text == '笑死':
+        #     message = AudioSendMessage(
+        #         original_content_url = url+'/static/audio/lmao.ogg',
+        #         duration=5000
+        #         )
         
     ###########################################################################
 
@@ -183,8 +183,8 @@ def handle_message(event):
 
     ###########################################################################
 
-        if event.message.text == 'GG人':
-            message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n157\n呱呱\n笑死\n')   
+        # if event.message.text == 'GG人':
+        #     message = TextSendMessage(text='銀河\n妲黑\n抽\n凸\n!匯率\n!股票\n消夜 宵夜\n157\n呱呱\n笑死\n')   
 
     ###########################################################################
 
