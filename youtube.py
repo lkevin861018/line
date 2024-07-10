@@ -1,6 +1,7 @@
 from googleapiclient.discovery import build
+import os
 
-api_key = "AIzaSyCqs3DTNlGfX7wmZU2l98Ga5zTaN2votgo"
+api_key = os.getenv('youtube_key')
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 def search_videos(query, max_results=5):
