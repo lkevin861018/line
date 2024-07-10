@@ -8,6 +8,7 @@ import dollar,food,ggopenai
 from openai import BadRequestError
 import random as rd
 from dotenv import load_dotenv
+from youtube import youtube_search
 
 load_dotenv()
 line_token = os.getenv('line_token')
@@ -147,15 +148,6 @@ def handle_message(event):
             message = TextSendMessage(
                 rep
             )
-        
-        # if event.message.text.find('#') == 0:
-        #     txtb = re.findall('#{1}\S*\s{1}',event.message.text)[0]
-        #     txt = event.message.text.split(txtb)[1]
-        #     lang = event.message.text.split(' ')[0].split('#')[1]  
-        #     message = TextSendMessage(
-        #         translator.trans(txt = txt,lang = lang)
-        #     ) 
-        
        
         if event.message.text.find('@GG人畫圖') == 0:
             req = event.message.text.split('@GG人畫圖 ')[1]
@@ -178,8 +170,11 @@ def handle_message(event):
                 ggopenai.cgpt(ask = ask,gen = "gpt-3.5-turbo-16k")
             )
             
-        if event.message.text == '喝啥':
-            message = TextSendMessage(food.what_to_drink())
+        if event.message.text.find('!yt') == 0:
+            req = event.message.text.split('!yt')[1]
+            message = TextSendMessage(youtube_search(req))
+            
+
 
     ###########################################################################
 
