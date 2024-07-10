@@ -171,8 +171,12 @@ def handle_message(event):
             )
             
         if event.message.text.find('#yt') == 0:
-            req = event.message.text.split('#yt')[1]
-            message = TextSendMessage(youtube_search(req))
+            req = event.message.text
+            query = re.split('#yt\d* ',req)[1]
+            num = req.split(' ')[0].split('#yt')[1]
+            if num == '':
+                num = 1
+            message = TextSendMessage(youtube_search(query,int(num)))
             
 
 
