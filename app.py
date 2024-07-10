@@ -170,8 +170,8 @@ def handle_message(event):
                 ggopenai.cgpt(ask = ask,gen = "gpt-3.5-turbo-16k")
             )
             
-        if event.message.text.find('!yt') == 0:
-            req = event.message.text.split('!yt')[1]
+        if event.message.text.find('#yt') == 0:
+            req = event.message.text.split('#yt')[1]
             message = TextSendMessage(youtube_search(req))
             
 
