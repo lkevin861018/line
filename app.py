@@ -95,8 +95,8 @@ def ggtalk():
 def handle_message(event):
     if isinstance(event.message,TextMessage):
         url = 'https://linegg.onrender.com'
-        # if event.message.text == '銀河':
-        #     message = TextSendMessage(text='大便')   
+        if event.message.text == '銀河':
+            message = TextSendMessage(text='大便')   
         # elif event.message.text == '妲黑':
         #     message = ImageSendMessage(
         #         original_content_url = url+'/static/dahate.png',
@@ -108,12 +108,12 @@ def handle_message(event):
         #         original_content_url = url+'/static/fk/fk%d.jpg'%random_num,
         #         preview_image_url = url+'/static/fk/fk%d.jpg'%random_num
         #         )
-        # elif event.message.text == '抽':
-        #     random_num = rd.randint(1,63)
-        #     message = ImageSendMessage(
-        #         original_content_url = url+'/static/roll/%d.png'%random_num,
-        #         preview_image_url = url+'/static/roll/%d.png'%random_num
-        #         )
+        elif event.message.text == '抽':
+            random_num = rd.randint(1,33)
+            message = ImageSendMessage(
+                original_content_url = url+'/static/roll/%d.png'%random_num,
+                preview_image_url = url+'/static/roll/%d.png'%random_num
+                )
         # elif event.message.text.find('消夜') >= 0 or event.message.text.find('宵夜') >= 0:
         #     message = TextSendMessage('麥當勞辣味雞塊')
         # elif event.message.text == '157':
