@@ -109,10 +109,16 @@ def handle_message(event):
         #         preview_image_url = url+'/static/fk/fk%d.jpg'%random_num
         #         )
         elif event.message.text == '抽':
-            random_num = rd.randint(1,33)
+            random_num = rd.randint(1,42)
             message = ImageSendMessage(
-                original_content_url = url+'/static/roll/%d.png'%random_num,
-                preview_image_url = url+'/static/roll/%d.png'%random_num
+                original_content_url = url+'/static/roll/%d_line.png'%random_num,
+                preview_image_url = url+'/static/roll/%d_line.png'%random_num
+                )
+        elif event.message.text.find('rolltest') == 0:
+            test_num = event.message.text.split(' ')[1]
+            message = ImageSendMessage(
+                original_content_url = url+'/static/roll/%s_line.png'%test_num,
+                preview_image_url = url+'/static/roll/%s_line.png'%test_num
                 )
         # elif event.message.text.find('消夜') >= 0 or event.message.text.find('宵夜') >= 0:
         #     message = TextSendMessage('麥當勞辣味雞塊')
@@ -159,17 +165,12 @@ def handle_message(event):
                 )
             except BadRequestError:
                 message = TextSendMessage('我是政確的狗汪汪!')
-        elif event.message.text.find('@GG人4') == 0:
+        elif event.message.text.find('@GG人') == 0:
             ask = event.message.text.split('@GG人4 ')[1]
             message = TextSendMessage(
                 ggopenai.cgpt(ask = ask,gen = "gpt-4o-2024-05-13")
             )
-        elif event.message.text.find('@GG人') == 0:
-            ask = event.message.text.split('@GG人 ')[1]
-            message = TextSendMessage(
-                ggopenai.cgpt(ask = ask,gen = "gpt-3.5-turbo-16k")
-            )
-            
+
         if event.message.text.find('#yt') == 0:
             req = event.message.text
             query = re.split('#yt\d* ',req)[1]
