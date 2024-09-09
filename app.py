@@ -109,7 +109,7 @@ def handle_message(event):
         #         preview_image_url = url+'/static/fk/fk%d.jpg'%random_num
         #         )
         elif event.message.text == '抽':
-            random_num = rd.randint(1,45)
+            random_num = rd.randint(1,46)
             message = ImageSendMessage(
                 original_content_url = url+'/static/roll/%d_line.png'%random_num,
                 preview_image_url = url+'/static/roll/%d_line.png'%random_num
