@@ -109,7 +109,7 @@ def handle_message(event):
         #         preview_image_url = url+'/static/fk/fk%d.jpg'%random_num
         #         )
         elif event.message.text == '抽':
-            random_num = rd.randint(1,46)
+            random_num = rd.randint(1,49)
             message = ImageSendMessage(
                 original_content_url = url+'/static/roll/%d_line.png'%random_num,
                 preview_image_url = url+'/static/roll/%d_line.png'%random_num
@@ -120,24 +120,12 @@ def handle_message(event):
                 original_content_url = url+'/static/roll/%s_line.png'%test_num,
                 preview_image_url = url+'/static/roll/%s_line.png'%test_num
                 )
-        # elif event.message.text.find('消夜') >= 0 or event.message.text.find('宵夜') >= 0:
-        #     message = TextSendMessage('麥當勞辣味雞塊')
         # elif event.message.text == '157':
         #     message = TextSendMessage('@恩💋妲 익은 Annie')
         # elif event.message.text == '巧多多':
         #     message = TextSendMessage('忘記帶傘了')
         # elif event.message.text == '爛透了':
         #     message = TextSendMessage('就是在說你')
-        # elif event.message.text == '呱呱':
-        #     message = AudioSendMessage(
-        #         original_content_url = url+'/static/audio/gua.ogg',
-        #         duration=300
-        #         )
-        # elif event.message.text == '笑死':
-        #     message = AudioSendMessage(
-        #         original_content_url = url+'/static/audio/lmao.ogg',
-        #         duration=5000
-        #         )
         
     ###########################################################################
 
