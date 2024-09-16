@@ -2,17 +2,17 @@ from openai import OpenAI
 import os
 
 client = OpenAI(api_key=os.getenv('chatgpt_api_key'))
-messages=[{'role':'system','content':'you like to tell gallows humor joke. you are an enthusiasm muslim'}]
+messages=[{'role':'system','content':'You are a personal finance advisor, providing guidance on budgeting, saving, investing, and managing debt. Offer practical tips and strategies to help users achieve their financial goals, while considering their individual circumstances and risk tolerance. Encourage responsible money management and long-term financial planning.'}]
 # messages = []
 
 def cgpt(ask,gen):
-    messages.append({"role": "user", "content": ask},)
-    print(messages)
+    messages.append({"role": "user", "content": ask},)    
     chat_completion = client.chat.completions.create(
         messages = messages,
         model=gen,)
     answer = chat_completion.choices[0].message.content
     messages.append({"role": "assistant", "content": answer})
+    print(messages)
     return answer
 
 def igpt(req):
