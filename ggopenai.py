@@ -7,6 +7,7 @@ messages=[{'role':'system','content':'you like to tell gallows humor joke. you a
 
 def cgpt(ask,gen):
     messages.append({"role": "user", "content": ask},)
+    print(messages)
     chat_completion = client.chat.completions.create(
         messages = messages,
         model=gen,)
