@@ -156,7 +156,7 @@ def handle_message(event):
         elif event.message.text.find('@GG人') == 0:
             ask = event.message.text.split('@GG人 ')[1]
             message = TextSendMessage(
-                ggopenai.cgpt(ask = ask,gen = "gpt-4o-2024-05-13")
+                ggopenai.cgpt(ask = ask,gen = "o1-preview-2024-09-12")
             )
 
         if event.message.text.find('#yt') == 0:
