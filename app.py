@@ -109,13 +109,23 @@ def handle_message(event):
         #         preview_image_url = url+'/static/fk/fk%d.jpg'%random_num
         #         )
         elif event.message.text == '抽':
-            random_num = rd.randint(1,49)
+            random_num = rd.randint(1,50)
+            if random_num == 50:
+                message = ImageSendMessage(
+                original_content_url = url+'/static/roll/%d_line.gif'%random_num,
+                preview_image_url = url+'/static/roll/%d_line.gif'%random_num
+                )
             message = ImageSendMessage(
                 original_content_url = url+'/static/roll/%d_line.png'%random_num,
                 preview_image_url = url+'/static/roll/%d_line.png'%random_num
                 )
         elif event.message.text.find('rolltest') == 0:
             test_num = event.message.text.split(' ')[1]
+            if test_num == 50:
+                message = ImageSendMessage(
+                original_content_url = url+'/static/roll/%d_line.gif'%random_num,
+                preview_image_url = url+'/static/roll/%d_line.gif'%random_num
+                )
             message = ImageSendMessage(
                 original_content_url = url+'/static/roll/%s_line.png'%test_num,
                 preview_image_url = url+'/static/roll/%s_line.png'%test_num
