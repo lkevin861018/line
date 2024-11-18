@@ -94,7 +94,7 @@ def ggtalk():
 @handler.add(MessageEvent, message=(TextMessage,ImageMessage))
 def handle_message(event):
     if isinstance(event.message,TextMessage):
-        url = 'https://linegg.onrender.com'
+        url = 'https://line-m800.onrender.com'
         if event.message.text == '銀河':
             message = TextSendMessage(text='大便')   
         # elif event.message.text == '妲黑':
@@ -213,7 +213,7 @@ def handle_message(event):
 def periodic_task():
     stream_status = 'on'
     while True:
-        da_url = 'https://linegg.onrender.com/da'
+        da_url = 'https://line-m800.onrender.com/da'
         params = {"stream_status": stream_status}
         stream_status = requests.get(da_url,params=params)
         # print(stream_status)
