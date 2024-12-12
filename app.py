@@ -38,8 +38,9 @@ def callback():
         events = json.loads(body).get('events', [])
         for event in events:
             if event['type'] == 'join' or 'message':
-                group_id = event['source']['userId']
-                print(f'Bot joined group: {group_id}')
+                group_id = event['source']['groupId']
+                user_id = event['source']['userId']
+                print(f'Bot joined group: {group_id},user: {user_id}')
     except Exception as e:
         print(e)
 
