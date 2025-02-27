@@ -97,7 +97,11 @@ def handle_message(event):
     if isinstance(event.message,TextMessage):
         url = 'https://line-m800.onrender.com'
         if event.message.text == '銀河':
-            message = TextSendMessage(text='是母狗')   
+        #     message = TextSendMessage(text='是母狗')   
+            message = ImageSendMessage(
+                original_content_url = url+'/static/boyvfv_is_dog.jpg',
+                preview_image_url = url+'/static/boyvfv_is_dog.jpg'
+                )
         # elif event.message.text == '妲黑':
         #     message = ImageSendMessage(
         #         original_content_url = url+'/static/dahate.png',
