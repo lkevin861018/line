@@ -166,7 +166,7 @@ def handle_message(event):
             ask = event.message.text.split('@GG人 ')[1]
             message = TextSendMessage(
                 # ggopenai.cgpt(ask = ask,gen = "chatgpt-4o-latest")
-                ggopenai.cgpt(ask = ask,gen = "chatgpt-o3-mini-latest")
+                ggopenai.cgpt(ask = ask,gen = "chatgpt-o3-mini")
             )
 
         if event.message.text.find('#yt') == 0:
