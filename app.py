@@ -135,6 +135,11 @@ def handle_message(event):
                 original_content_url = url+'/static/roll/%s_line.png'%test_num,
                 preview_image_url = url+'/static/roll/%s_line.png'%test_num
                 )
+        elif event.message.text == '班表':
+            message = ImageSendMessage(
+                original_content_url = url+'/static/schedule/25_sep.png',
+                preview_image_url = url+'/static/schedule/25_sep.png'
+                )
         
     ###########################################################################
 
