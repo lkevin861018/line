@@ -140,17 +140,16 @@ def handle_message(event):
                 original_content_url = url+'/static/schedule/25_sep.png',
                 preview_image_url = url+'/static/schedule/25_sep.png'
                 )
-
-        elif event.message.text == '今日運勢';
-            fortune = [
+        elif event.message.text == '今日運勢':
+            fortunes = [
                 "大吉",
                 "中吉",
                 "小吉",
                 "小兇",
                 "中兇",
-                "大兇",
-        ]
-        message = TextSendMessage(text=rd.choice(fortunes))
+                "大兇"
+                ]
+            message = TextSendMessage(text=rd.choice(fortunes))
         
     ###########################################################################
  
