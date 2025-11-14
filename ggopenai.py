@@ -9,9 +9,10 @@ def cgpt(ask,gen):
     messages.append({"role": "user", "content": ask},)    
     chat_completion = client.chat.completions.create(
         messages = messages,
-        model=gen,
-        frequency_penalty=-0.5,
-        #presence_penalty=2
+        model = gen,
+        text = {
+            "verbosity": "low"
+        }
     )
     answer = chat_completion.choices[0].message.content
     messages.append({"role": "assistant", "content": answer})
