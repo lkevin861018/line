@@ -20,7 +20,7 @@ def cgpt(ask,gen):
 def igpt(req):
     image_compleion = client.images.generate(
     # model="dall-e-3",
-    model="gpt-image-1"
+    model="gpt-image-1",
     prompt=req,
     size="auto",
     quality="auto",
