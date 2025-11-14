@@ -11,7 +11,8 @@ def cgpt(ask,gen):
         messages = messages,
         model=gen,
         frequency_penalty=-0.5,
-        presence_penalty=2)
+        #presence_penalty=2
+    )
     answer = chat_completion.choices[0].message.content
     messages.append({"role": "assistant", "content": answer})
     print(messages)
