@@ -32,25 +32,34 @@ def index():
 def callback():
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
 
+    # 先解析 events 才有 userId
     try:
         events = json.loads(body).get('events', [])
-        for event in events:
-            if event['type'] == 'join' or 'message':
-                group_id = event['source']['groupId']
-                user_id = event['source']['userId']
-                print(f'Bot joined group: {group_id},user: {user_id}')
     except Exception as e:
-        print(e)
+        app.logger.error(f"[ParseError] {e}")
+        abort(400)
 
+    # 加 userId 到 log
+    for event in events:
+        user_id = event['source'].get('userId', 'UnknownUser')
+        event_type = event.get('type', '')
 
+        app.logger.info(f"[{user_id}] Incoming event: {event_type}")
 
+        # 修正判斷式
+        if event_type in ('join', 'message'):
+            group_id = event['source'].get('groupId', 'NoGroup')
+            app.logger.info(f"[{user_id}] Bot joined group: {group_id}")
+
+    # 呼叫 LINE handler
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
+
     return 'OK'
+
 
 @app.route('/da',methods = ['GET'])
 def da():
