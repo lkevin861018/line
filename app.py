@@ -123,7 +123,7 @@ def handle_message(event):
         #         preview_image_url = url+'/static/fk/fk%d.jpg'%random_num
         #         )
         elif event.message.text == '抽':
-            random_num = rd.randint(1,143)
+            random_num = rd.randint(1,151)
             # if random_num == 50:
             #     message = ImageCarouselColumn(
             #     image_url = url+'/static/roll/%d_line.gif'%random_num,
