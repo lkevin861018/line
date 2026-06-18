@@ -10,6 +10,7 @@
 - `上傳圖片`：開啟 1 分鐘上傳窗口，下一張圖片會存到 `static/line_uploads/`
 - `@GG人 <內容>`：使用 OpenAI Responses API 回覆聊天內容
 - `@GG人畫圖 <內容>`：使用 GPT Image 生成圖片，儲存在 `static/generated/` 後回傳圖片 URL
+- `@GG人改圖 <指令>`：開啟 1 分鐘改圖窗口，下一張圖片會依指令修改，結果存到 `static/改圖/` 並同步 GitHub
 
 ## 環境變數
 
@@ -76,6 +77,8 @@ Keep-alive 參數直接寫在 `app.py`，預設每 5 分鐘 GET 一次公開 `/c
 
 `上傳圖片` 會先把圖片寫入目前執行環境的專案目錄 `static/line_uploads/`。若 `GITHUB_TOKEN` 與 repository 設定完整，Bot 會再透過 GitHub Contents API 將圖片 commit 回 GitHub。
 
+`@GG人改圖 <指令>` 會等待同一聊天室 1 分鐘內的下一張圖片，使用 GPT Image 編輯圖片，將結果存到 `static/改圖/`，回覆改好的圖片，並在 GitHub 設定完整時 commit 回 GitHub。
+
 GitHub token 權限建議：
 
 - Fine-grained token：此 repository 的 `Contents` 設為 `Read and write`
@@ -99,6 +102,7 @@ GitHub token 權限建議：
 - `static/boyvfv/`：銀河圖片素材
 - `static/roll/`：抽圖素材
 - `static/line_uploads/`：LINE 指令上傳的圖片
+- `static/改圖/`：GPT Image 改圖結果
 - `static/generated/`：GPT 圖像生成結果，內容不提交 git
 - `gunicorn_config.py`：Render/gunicorn 設定
 - `requirements.txt`：部署依賴

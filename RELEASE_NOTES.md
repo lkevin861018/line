@@ -25,6 +25,13 @@
 - 新增 GitHub Contents API 圖片回寫，設定 `GITHUB_TOKEN` 與 repository 後，上傳圖片會 commit 回 GitHub。
 - 新增 `github_api.py` 管理 GitHub API 呼叫與錯誤處理。
 
+### LINE 圖片改圖
+
+- 新增 `@GG人改圖 <指令>` 指令，呼叫後 1 分鐘內同一聊天室的下一張圖片會送到 GPT Image 編輯。
+- 新增 `static/改圖/` 目錄儲存改圖結果。
+- 改圖完成後會回覆編輯後圖片與狀態文字。
+- GitHub 設定完整時，改圖結果會透過 GitHub Contents API commit 回 `static/改圖/`。
+
 ### OpenAI 調整
 
 - `@GG人` 改用 OpenAI Responses API 的 message list，不再將聊天歷史串成單一文字。
@@ -59,3 +66,6 @@
 - 使用 mock requests 測試 GitHub Contents API payload，確認 branch 與 base64 content 會正確送出。
 - `/callback` GET smoke test 回傳 `200 OK`。
 - keep-alive URL override 測試通過。
+- 改圖 session 與上傳 session 互斥邏輯測試通過。
+- `ggopenai.edit_image()` 使用 mock OpenAI client 測試通過。
+- 改圖 GitHub 回寫路徑 `static/改圖/...` 使用 mock 測試通過。

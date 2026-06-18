@@ -1,10 +1,12 @@
 import json
 import os
 import random as rd
+import tempfile
 import threading
 import time
 import uuid
 from pathlib import Path
+from urllib.parse import quote
 
 import requests
 from dotenv import load_dotenv
@@ -39,9 +41,11 @@ BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 BOYVFV_DIR = STATIC_DIR / "boyvfv"
 LINE_UPLOAD_DIR = STATIC_DIR / "line_uploads"
+IMAGE_EDIT_DIR = STATIC_DIR / "改圖"
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 UPLOAD_COMMAND = os.getenv("LINE_IMAGE_UPLOAD_COMMAND", "上傳圖片")
 UPLOAD_WINDOW_SECONDS = env_int("LINE_IMAGE_UPLOAD_WINDOW_SECONDS", 60)
+IMAGE_EDIT_COMMAND = "@GG人改圖"
 APP_BASE_URL = "https://line-m800.onrender.com"
 KEEP_ALIVE_ENABLED = True
 KEEP_ALIVE_INTERVAL_SECONDS = 300
@@ -49,6 +53,7 @@ KEEP_ALIVE_TIMEOUT_SECONDS = 10
 KEEP_ALIVE_PATH = "/callback"
 KEEP_ALIVE_URL = f"{APP_BASE_URL}{KEEP_ALIVE_PATH}"
 upload_sessions = {}
+image_edit_sessions = {}
 keep_alive_started = False
 
 
@@ -57,7 +62,8 @@ def public_base_url():
 
 
 def static_url(path):
-    return f"{public_base_url()}/static/{path.lstrip('/')}"
+    encoded_path = quote(path.lstrip("/").replace("\\", "/"), safe="/")
+    return f"{public_base_url()}/static/{encoded_path}"
 
 
 def image_message(static_path):
@@ -92,7 +98,18 @@ def source_key(event):
 
 
 def begin_upload_session(event):
-    upload_sessions[source_key(event)] = time.time() + UPLOAD_WINDOW_SECONDS
+    key = source_key(event)
+    image_edit_sessions.pop(key, None)
+    upload_sessions[key] = time.time() + UPLOAD_WINDOW_SECONDS
+
+
+def begin_image_edit_session(event, prompt):
+    key = source_key(event)
+    upload_sessions.pop(key, None)
+    image_edit_sessions[key] = {
+        "expires_at": time.time() + UPLOAD_WINDOW_SECONDS,
+        "prompt": prompt,
+    }
 
 
 def consume_upload_session(event):
@@ -109,15 +126,33 @@ def consume_upload_session(event):
     return True
 
 
+def consume_image_edit_session(event):
+    key = source_key(event)
+    session = image_edit_sessions.get(key)
+    if not session:
+        return None
+
+    if time.time() > session["expires_at"]:
+        image_edit_sessions.pop(key, None)
+        return None
+
+    image_edit_sessions.pop(key, None)
+    return session["prompt"]
+
+
+def download_line_image_to_path(message_id, output_path):
+    message_content = line_bot_api.get_message_content(message_id)
+    with output_path.open("wb") as image_file:
+        for chunk in message_content.iter_content():
+            image_file.write(chunk)
+
+
 def save_line_image(message_id):
     LINE_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     file_name = f"{time.strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex}.jpg"
     output_path = LINE_UPLOAD_DIR / file_name
 
-    message_content = line_bot_api.get_message_content(message_id)
-    with output_path.open("wb") as image_file:
-        for chunk in message_content.iter_content():
-            image_file.write(chunk)
+    download_line_image_to_path(message_id, output_path)
 
     return f"line_uploads/{file_name}", output_path
 
@@ -129,6 +164,30 @@ def write_line_image_to_github(static_path, local_path):
         repo_path=repo_path,
         commit_message=f"Add LINE uploaded image {repo_path}",
     )
+
+
+def write_edited_image_to_github(static_path, local_path):
+    repo_path = f"static/{static_path}".replace("\\", "/")
+    return github_api.upload_file(
+        local_path=local_path,
+        repo_path=repo_path,
+        commit_message=f"Add edited image {repo_path}",
+    )
+
+
+def edit_line_image(message_id, prompt):
+    IMAGE_EDIT_DIR.mkdir(parents=True, exist_ok=True)
+    temp_path = None
+
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp_file:
+            temp_path = Path(temp_file.name)
+
+        download_line_image_to_path(message_id, temp_path)
+        return ggopenai.edit_image(temp_path, prompt, output_dir=IMAGE_EDIT_DIR)
+    finally:
+        if temp_path and temp_path.exists():
+            temp_path.unlink()
 
 
 def keep_alive_url():
@@ -204,7 +263,39 @@ def handle_message(event):
     message = None
 
     if isinstance(event.message, ImageMessage):
-        if consume_upload_session(event):
+        edit_prompt = consume_image_edit_session(event)
+        if edit_prompt:
+            try:
+                static_path, local_path = edit_line_image(event.message.id, edit_prompt)
+                if github_api.is_enabled():
+                    write_edited_image_to_github(static_path, local_path)
+                    message = [
+                        image_message(static_path),
+                        TextSendMessage(text="改圖完成並同步 GitHub"),
+                    ]
+                else:
+                    message = [
+                        image_message(static_path),
+                        TextSendMessage(text="改圖完成，尚未設定 GitHub 回寫"),
+                    ]
+            except github_api.GitHubUploadError as exc:
+                app.logger.exception("GitHub edited image write-back failed: %s", exc)
+                message = [
+                    image_message(static_path),
+                    TextSendMessage(text="改圖完成，但 GitHub 回寫失敗"),
+                ]
+            except github_api.GitHubConfigError as exc:
+                app.logger.warning("GitHub edited image write-back skipped: %s", exc)
+                message = [
+                    image_message(static_path),
+                    TextSendMessage(text="改圖完成，GitHub 設定不完整"),
+                ]
+            except BadRequestError:
+                message = TextSendMessage(text="改圖失敗，圖片或指令可能不符合要求")
+            except Exception as exc:
+                app.logger.exception("OpenAI image edit failed: %s", exc)
+                message = TextSendMessage(text="改圖失敗，請再試一次")
+        elif consume_upload_session(event):
             try:
                 static_path, local_path = save_line_image(event.message.id)
                 if github_api.is_enabled():
@@ -241,6 +332,13 @@ def handle_message(event):
     elif text == UPLOAD_COMMAND: # 上傳圖片
         begin_upload_session(event)
         message = TextSendMessage(text="請在 1 分鐘內傳送要儲存的圖片")
+    elif text.startswith(IMAGE_EDIT_COMMAND):
+        prompt = text[len(IMAGE_EDIT_COMMAND) :].strip()
+        if not prompt:
+            message = TextSendMessage(text="請輸入改圖指令，例如：@GG人改圖 把背景改成海邊")
+        else:
+            begin_image_edit_session(event, prompt)
+            message = TextSendMessage(text="請在 1 分鐘內傳送要修改的圖片")
     elif text.startswith("rolltest"):
         test_num = text[len("rolltest") :].strip()
         if not test_num.isdigit():

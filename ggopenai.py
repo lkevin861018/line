@@ -91,6 +91,32 @@ def igpt(req, output_dir=None):
     return f"generated/{file_name}"
 
 
+def edit_image(image_path, prompt, output_dir=None):
+    image_path = Path(image_path)
+    with image_path.open("rb") as image_file:
+        image_completion = openai_client().images.edit(
+            model=DEFAULT_IMAGE_MODEL,
+            image=image_file,
+            prompt=prompt,
+            size=DEFAULT_IMAGE_SIZE,
+            quality=DEFAULT_IMAGE_QUALITY,
+            n=1,
+        )
+
+    image_data = image_completion.data[0]
+    image_bytes = _image_bytes(image_data)
+
+    static_root = Path(__file__).resolve().parent / "static"
+    edited_dir = Path(output_dir) if output_dir else static_root / "改圖"
+    edited_dir.mkdir(parents=True, exist_ok=True)
+
+    file_name = f"{uuid.uuid4().hex}.png"
+    output_path = edited_dir / file_name
+    output_path.write_bytes(image_bytes)
+
+    return f"改圖/{file_name}", output_path
+
+
 def _image_bytes(image_data):
     if getattr(image_data, "b64_json", None):
         return base64.b64decode(image_data.b64_json)
