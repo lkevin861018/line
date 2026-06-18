@@ -163,7 +163,7 @@ def handle_message(event):
         if consume_upload_session(event):
             try:
                 static_path = save_line_image(event.message.id)
-                message = TextSendMessage(text=f"圖片已儲存：static/{static_path}")
+                message = TextSendMessage(text=f"圖片已儲存")
             except Exception as exc:
                 app.logger.exception("LINE image upload failed: %s", exc)
                 message = TextSendMessage(text="圖片儲存失敗，請再試一次")
@@ -184,7 +184,7 @@ def handle_message(event):
     elif text == "抽":
         random_num = rd.randint(1, 134)
         message = image_message(f"roll/{random_num}_line.png")
-    elif text == UPLOAD_COMMAND:
+    elif text == UPLOAD_COMMAND: # 上傳圖片
         begin_upload_session(event)
         message = TextSendMessage(text="請在 1 分鐘內傳送要儲存的圖片")
     elif text.startswith("rolltest"):

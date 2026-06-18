@@ -1,2 +1,0 @@
-1.將boyvfv_is_dog.jpg放入\static\boyvfv，並比照"抽"將"銀河"改為抽選該目錄圖片
-2.在static下新增一個目錄，新增linebot上傳圖片指令，於聊天室呼叫指令後一分鐘內的下一張圖片會被存入當前連結github專案的該目錄
