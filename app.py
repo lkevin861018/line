@@ -1,10 +1,12 @@
 import json
 import os
 import random as rd
+import threading
 import time
 import uuid
 from pathlib import Path
 
+import requests
 from dotenv import load_dotenv
 from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
@@ -40,23 +42,18 @@ LINE_UPLOAD_DIR = STATIC_DIR / "line_uploads"
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 UPLOAD_COMMAND = os.getenv("LINE_IMAGE_UPLOAD_COMMAND", "上傳圖片")
 UPLOAD_WINDOW_SECONDS = env_int("LINE_IMAGE_UPLOAD_WINDOW_SECONDS", 60)
+APP_BASE_URL = "https://line-m800.onrender.com"
+KEEP_ALIVE_ENABLED = True
+KEEP_ALIVE_INTERVAL_SECONDS = 300
+KEEP_ALIVE_TIMEOUT_SECONDS = 10
+KEEP_ALIVE_PATH = "/callback"
+KEEP_ALIVE_URL = f"{APP_BASE_URL}{KEEP_ALIVE_PATH}"
 upload_sessions = {}
+keep_alive_started = False
 
 
 def public_base_url():
-    base_url = (
-        os.getenv("APP_BASE_URL")
-        or os.getenv("PUBLIC_BASE_URL")
-        or os.getenv("RENDER_EXTERNAL_URL")
-    )
-    if base_url:
-        return base_url.rstrip("/")
-
-    render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME")
-    if render_hostname:
-        return f"https://{render_hostname.strip('/')}"
-
-    return request.url_root.rstrip("/")
+    return APP_BASE_URL.rstrip("/")
 
 
 def static_url(path):
@@ -134,13 +131,50 @@ def write_line_image_to_github(static_path, local_path):
     )
 
 
+def keep_alive_url():
+    return KEEP_ALIVE_URL
+
+
+def keep_alive_loop():
+    while True:
+        time.sleep(KEEP_ALIVE_INTERVAL_SECONDS)
+        target_url = keep_alive_url()
+        if not target_url:
+            app.logger.info("Keep-alive skipped: no public base URL configured")
+            continue
+
+        try:
+            response = requests.get(target_url, timeout=KEEP_ALIVE_TIMEOUT_SECONDS)
+            app.logger.info("Keep-alive ping %s -> %s", target_url, response.status_code)
+        except requests.RequestException as exc:
+            app.logger.warning("Keep-alive ping failed: %s", exc)
+
+
+def start_keep_alive():
+    global keep_alive_started
+
+    if keep_alive_started or not KEEP_ALIVE_ENABLED or KEEP_ALIVE_INTERVAL_SECONDS <= 0:
+        return
+
+    if not keep_alive_url():
+        app.logger.info("Keep-alive disabled: no public URL configured")
+        return
+
+    thread = threading.Thread(target=keep_alive_loop, name="render-keep-alive", daemon=True)
+    thread.start()
+    keep_alive_started = True
+
+
 @app.route("/index", methods=["GET", "POST"])
 def index():
     return "Hello World!!"
 
 
-@app.route("/callback", methods=["POST"])
+@app.route("/callback", methods=["GET", "POST"])
 def callback():
+    if request.method == "GET":
+        return "OK"
+
     signature = request.headers.get("X-Line-Signature", "")
     body = request.get_data(as_text=True)
 
@@ -175,7 +209,7 @@ def handle_message(event):
                 static_path, local_path = save_line_image(event.message.id)
                 if github_api.is_enabled():
                     write_line_image_to_github(static_path, local_path)
-                    message = TextSendMessage(text="圖片已儲存並回寫 GitHub")
+                    message = TextSendMessage(text="圖片上傳成功!")
                 else:
                     message = TextSendMessage(text="圖片已儲存，尚未設定 GitHub 回寫")
             except github_api.GitHubUploadError as exc:
@@ -239,3 +273,6 @@ def handle_message(event):
 
     if message:
         line_bot_api.reply_message(event.reply_token, message)
+
+
+start_keep_alive()

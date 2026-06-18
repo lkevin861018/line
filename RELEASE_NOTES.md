@@ -14,7 +14,7 @@
 
 - `銀河`、`抽`、`rolltest` 改用部署服務的 `/static/...` 絕對 URL。
 - `銀河` 改成從 `static/boyvfv/` 目錄隨機抽選圖片。
-- 支援 `APP_BASE_URL`、`PUBLIC_BASE_URL`、`RENDER_EXTERNAL_URL`、`RENDER_EXTERNAL_HOSTNAME` 與 request host fallback。
+- 公開服務網址改為直接寫在 `app.py` 的 `APP_BASE_URL` 常數。
 
 ### LINE 圖片上傳
 
@@ -39,6 +39,9 @@
 - 簡化 `requirements.txt`，保留 Flask、gunicorn、LINE SDK、OpenAI SDK、dotenv、requests。
 - 簡化 `gunicorn_config.py`，用環境變數控制 workers、threads、timeout。
 - 保留 `build.sh` 作為 Render build command。
+- 新增 Render keep-alive 背景 thread，預設每 5 分鐘 GET 一次公開 `/callback`。
+- `/callback` 新增 GET health response，POST LINE webhook 驗簽流程維持不變。
+- keep-alive 參數改為直接寫在 `app.py`，不再讀取 `.env`。
 
 ### 測試紀錄
 
@@ -54,3 +57,5 @@
 - `app.py`、`ggopenai.py`、`gunicorn_config.py` 語法編譯通過。
 - `github_api.py` 語法編譯通過。
 - 使用 mock requests 測試 GitHub Contents API payload，確認 branch 與 base64 content 會正確送出。
+- `/callback` GET smoke test 回傳 `200 OK`。
+- keep-alive URL override 測試通過。

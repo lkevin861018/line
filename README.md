@@ -20,9 +20,6 @@
 | `line_token` 或 `LINE_CHANNEL_ACCESS_TOKEN` | LINE channel access token |
 | `line_secret` 或 `LINE_CHANNEL_SECRET` | LINE channel secret |
 | `OPENAI_API_KEY` 或 `chatgpt_api_key` | OpenAI API key |
-| `APP_BASE_URL` 或 `PUBLIC_BASE_URL` | 對外服務網址，建議設成 Render 網址 |
-| `RENDER_EXTERNAL_URL` | Render 提供的對外服務網址 |
-| `RENDER_EXTERNAL_HOSTNAME` | Render 提供的 hostname fallback |
 | `OPENAI_CHAT_MODEL` | 聊天模型，預設 `gpt-5.5` |
 | `OPENAI_IMAGE_MODEL` | 圖像模型，預設 `gpt-image-1` |
 | `OPENAI_IMAGE_SIZE` | 圖像尺寸，預設 `1024x1024` |
@@ -73,7 +70,9 @@ Start command：
 gunicorn -c gunicorn_config.py app:app
 ```
 
-Render 上建議設定 `APP_BASE_URL` 或 `PUBLIC_BASE_URL` 為正式服務網址，讓 LINE 能正確讀取 `/static/...` 圖片。
+目前公開服務網址直接寫在 `app.py` 的 `APP_BASE_URL` 常數，讓 LINE 能正確讀取 `/static/...` 圖片。
+
+Keep-alive 參數直接寫在 `app.py`，預設每 5 分鐘 GET 一次公開 `/callback`。`/callback` 的 GET 只回傳 `OK`，LINE webhook 的 POST 驗簽流程不受影響。
 
 `上傳圖片` 會先把圖片寫入目前執行環境的專案目錄 `static/line_uploads/`。若 `GITHUB_TOKEN` 與 repository 設定完整，Bot 會再透過 GitHub Contents API 將圖片 commit 回 GitHub。
 
