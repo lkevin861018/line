@@ -13,3 +13,4 @@ denv/
 
 static/generated/*
 !static/generated/.gitkeep
+調整事項.txt

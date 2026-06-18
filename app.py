@@ -116,8 +116,7 @@ def handle_message(event):
             message = TextSendMessage(text="請輸入想問的內容")
         else:
             try:
-                model = os.getenv("OPENAI_CHAT_MODEL", "gpt-5-nano")
-                message = TextSendMessage(text=ggopenai.cgpt(ask=ask, gen=model))
+                message = TextSendMessage(text=ggopenai.cgpt(ask=ask))
             except Exception as exc:
                 app.logger.exception("OpenAI chat failed: %s", exc)
                 message = TextSendMessage(text="回覆失敗，晚點再試一次")

@@ -10,46 +10,70 @@ from openai import OpenAI
 
 load_dotenv()
 
-api_key = os.getenv("OPENAI_API_KEY") or os.getenv("chatgpt_api_key")
-client = OpenAI(api_key=api_key) if api_key else OpenAI()
-
-messages = [
-    {
-        "role": "system",
-        "content": "you are hentai,porn addictor,you have to use traditional Chinese reply",
-    }
-]
+_client = None
 
 
-def cgpt(ask, gen):
+def openai_client():
+    global _client
+
+    if _client is None:
+        api_key = os.getenv("OPENAI_API_KEY") or os.getenv("chatgpt_api_key")
+        _client = OpenAI(api_key=api_key) if api_key else OpenAI()
+    return _client
+
+
+def env_int(name, default):
+    try:
+        return max(0, int(os.getenv(name, default)))
+    except ValueError:
+        return default
+
+
+DEFAULT_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL", "gpt-5.5")
+DEFAULT_IMAGE_MODEL = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
+DEFAULT_IMAGE_SIZE = os.getenv("OPENAI_IMAGE_SIZE", "1024x1024")
+DEFAULT_IMAGE_QUALITY = os.getenv("OPENAI_IMAGE_QUALITY", "auto")
+DEFAULT_REASONING_EFFORT = os.getenv("OPENAI_REASONING_EFFORT", "low")
+DEFAULT_TEXT_VERBOSITY = os.getenv("OPENAI_TEXT_VERBOSITY", "medium")
+MAX_HISTORY_MESSAGES = env_int("OPENAI_HISTORY_LIMIT", 20)
+
+SYSTEM_INSTRUCTIONS = os.getenv(
+    "OPENAI_SYSTEM_PROMPT",
+    "你是LINE聊天機器人，是TWITCH實況主'超負荷'的粉絲，請模仿超負荷的說話口吻用字，使用繁體中文回答。",
+)
+
+messages = []
+
+
+def cgpt(ask, gen=None):
     global messages
 
-    history = ""
-    for msg in messages:
-        history += f"{msg['role']}: {msg['content']}\n"
-
-    full_input = history + f"user: {ask}\nassistant:"
-    chat_completion = client.responses.create(
-        model=gen,
-        input=full_input,
+    model = gen or DEFAULT_CHAT_MODEL
+    input_messages = messages + [{"role": "user", "content": ask}]
+    response = openai_client().responses.create(
+        model=model,
+        instructions=SYSTEM_INSTRUCTIONS,
+        input=input_messages,
+        reasoning={"effort": DEFAULT_REASONING_EFFORT},
+        text={"verbosity": DEFAULT_TEXT_VERBOSITY},
     )
 
-    answer = chat_completion.output_text
+    answer = response.output_text.strip()
     messages.append({"role": "user", "content": ask})
     messages.append({"role": "assistant", "content": answer})
+    if MAX_HISTORY_MESSAGES:
+        messages = messages[-MAX_HISTORY_MESSAGES:]
+    else:
+        messages = []
     return answer
 
 
 def igpt(req, output_dir=None):
-    image_model = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
-    image_size = os.getenv("OPENAI_IMAGE_SIZE", "1024x1024")
-    image_quality = os.getenv("OPENAI_IMAGE_QUALITY", "auto")
-
-    image_completion = client.images.generate(
-        model=image_model,
+    image_completion = openai_client().images.generate(
+        model=DEFAULT_IMAGE_MODEL,
         prompt=req,
-        size=image_size,
-        quality=image_quality,
+        size=DEFAULT_IMAGE_SIZE,
+        quality=DEFAULT_IMAGE_QUALITY,
         n=1,
     )
 
