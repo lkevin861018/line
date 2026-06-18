@@ -271,7 +271,6 @@ def handle_message(event):
                     write_edited_image_to_github(static_path, local_path)
                     message = [
                         image_message(static_path),
-                        TextSendMessage(text="改圖完成並同步 GitHub"),
                     ]
                 else:
                     message = [
