@@ -22,6 +22,8 @@
 - 新增 `上傳圖片` 指令，呼叫後 1 分鐘內同一聊天室的下一張圖片會存入 `static/line_uploads/`。
 - 上傳指令可透過 `LINE_IMAGE_UPLOAD_COMMAND` 覆蓋。
 - 上傳等待秒數可透過 `LINE_IMAGE_UPLOAD_WINDOW_SECONDS` 覆蓋。
+- 新增 GitHub Contents API 圖片回寫，設定 `GITHUB_TOKEN` 與 repository 後，上傳圖片會 commit 回 GitHub。
+- 新增 `github_api.py` 管理 GitHub API 呼叫與錯誤處理。
 
 ### OpenAI 調整
 
@@ -50,3 +52,5 @@
 - `ggopenai.openai_client()` 可成功初始化 OpenAI client。
 - `_image_bytes()` 的 base64 圖片解析邏輯測試通過。
 - `app.py`、`ggopenai.py`、`gunicorn_config.py` 語法編譯通過。
+- `github_api.py` 語法編譯通過。
+- 使用 mock requests 測試 GitHub Contents API payload，確認 branch 與 base64 content 會正確送出。

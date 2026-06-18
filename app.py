@@ -12,6 +12,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import ImageMessage, ImageSendMessage, MessageEvent, TextMessage, TextSendMessage
 from openai import BadRequestError
 
+import github_api
 import ggopenai
 
 
@@ -121,7 +122,16 @@ def save_line_image(message_id):
         for chunk in message_content.iter_content():
             image_file.write(chunk)
 
-    return f"line_uploads/{file_name}"
+    return f"line_uploads/{file_name}", output_path
+
+
+def write_line_image_to_github(static_path, local_path):
+    repo_path = f"static/{static_path}".replace("\\", "/")
+    return github_api.upload_file(
+        local_path=local_path,
+        repo_path=repo_path,
+        commit_message=f"Add LINE uploaded image {repo_path}",
+    )
 
 
 @app.route("/index", methods=["GET", "POST"])
@@ -162,8 +172,18 @@ def handle_message(event):
     if isinstance(event.message, ImageMessage):
         if consume_upload_session(event):
             try:
-                static_path = save_line_image(event.message.id)
-                message = TextSendMessage(text=f"圖片已儲存")
+                static_path, local_path = save_line_image(event.message.id)
+                if github_api.is_enabled():
+                    write_line_image_to_github(static_path, local_path)
+                    message = TextSendMessage(text="圖片已儲存並回寫 GitHub")
+                else:
+                    message = TextSendMessage(text="圖片已儲存，尚未設定 GitHub 回寫")
+            except github_api.GitHubUploadError as exc:
+                app.logger.exception("GitHub image write-back failed: %s", exc)
+                message = TextSendMessage(text="圖片已儲存，但 GitHub 回寫失敗")
+            except github_api.GitHubConfigError as exc:
+                app.logger.warning("GitHub image write-back skipped: %s", exc)
+                message = TextSendMessage(text="圖片已儲存，GitHub 設定不完整")
             except Exception as exc:
                 app.logger.exception("LINE image upload failed: %s", exc)
                 message = TextSendMessage(text="圖片儲存失敗，請再試一次")
