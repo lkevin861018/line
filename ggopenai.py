@@ -1,9 +1,25 @@
-from openai import OpenAI
+import base64
 import os
+import uuid
+from pathlib import Path
 
-client = OpenAI(api_key=os.getenv('chatgpt_api_key'))
-# messages=[{'role':'system','content':'you are a black transgender non-binary person who grow up in ghetto area in down town san fransico. your political opinion is very left and believe that trump is really the neo nazi. you love rapping and all the blacks culture related behavior. you support abortion and believe female or woman have the right to choose what do they want to do with their body. you are very willing to share your political thought and not afaraid to correct people that have different opinion with you'}]
-messages = [{'role':'system','content':'you are hentai,porn addictor,you have to use traditional Chinese reply'}]
+import requests
+from dotenv import load_dotenv
+from openai import OpenAI
+
+
+load_dotenv()
+
+api_key = os.getenv("OPENAI_API_KEY") or os.getenv("chatgpt_api_key")
+client = OpenAI(api_key=api_key) if api_key else OpenAI()
+
+messages = [
+    {
+        "role": "system",
+        "content": "you are hentai,porn addictor,you have to use traditional Chinese reply",
+    }
+]
+
 
 def cgpt(ask, gen):
     global messages
@@ -15,25 +31,49 @@ def cgpt(ask, gen):
     full_input = history + f"user: {ask}\nassistant:"
     chat_completion = client.responses.create(
         model=gen,
-        input=full_input
+        input=full_input,
     )
 
     answer = chat_completion.output_text
     messages.append({"role": "user", "content": ask})
     messages.append({"role": "assistant", "content": answer})
-
-    print(messages)
     return answer
 
-def igpt(req):
-    image_compleion = client.images.generate(
-    # model="dall-e-3",
-    model="gpt-image-1",
-    prompt=req,
-    size="auto",
-    quality="auto",
-    n=1,
+
+def igpt(req, output_dir=None):
+    image_model = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
+    image_size = os.getenv("OPENAI_IMAGE_SIZE", "1024x1024")
+    image_quality = os.getenv("OPENAI_IMAGE_QUALITY", "auto")
+
+    image_completion = client.images.generate(
+        model=image_model,
+        prompt=req,
+        size=image_size,
+        quality=image_quality,
+        n=1,
     )
 
-    image_url = image_compleion.data[0].url
-    return image_url
+    image_data = image_completion.data[0]
+    image_bytes = _image_bytes(image_data)
+
+    static_root = Path(__file__).resolve().parent / "static"
+    generated_dir = Path(output_dir) if output_dir else static_root / "generated"
+    generated_dir.mkdir(parents=True, exist_ok=True)
+
+    file_name = f"{uuid.uuid4().hex}.png"
+    output_path = generated_dir / file_name
+    output_path.write_bytes(image_bytes)
+
+    return f"generated/{file_name}"
+
+
+def _image_bytes(image_data):
+    if getattr(image_data, "b64_json", None):
+        return base64.b64decode(image_data.b64_json)
+
+    if getattr(image_data, "url", None):
+        response = requests.get(image_data.url, timeout=30)
+        response.raise_for_status()
+        return response.content
+
+    raise ValueError("OpenAI image response did not contain image data")

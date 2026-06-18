@@ -1,0 +1,3 @@
+1.整理此專案，留下LINE的必較功能、"抽"、"rolltest"、"銀河"、openai api的相關指令、Render上的部屬設定，其餘刪除，並將非必要上傳的環境設定加入ignore
+2.專案會上傳github並部屬於render，請將"抽"、"rolltest"的圖片位置改為讀取render部屬伺服器的static路徑
+3.將"GG人畫圖"的繪圖功能改為使用GPT模組而非DALL

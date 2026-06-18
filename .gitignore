@@ -1,0 +1,15 @@
+.env
+.env.*
+*.log
+
+__pycache__/
+*.py[cod]
+
+.venv/
+venv/
+denv/
+
+.vscode/
+
+static/generated/*
+!static/generated/.gitkeep
