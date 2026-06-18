@@ -6,13 +6,22 @@
 
 - 精簡專案，只保留 LINE 必要功能、`銀河`、`抽`、`rolltest`、OpenAI API 相關指令與 Render 部署設定。
 - 移除匯率、股票、YouTube、班表、Twitch 與其他未保留功能模組。
-- 清理未使用 static 資源，保留 `static/roll/` 與 `static/boyvfv_is_dog.jpg`。
+- 清理未使用 static 資源，保留 `static/roll/` 與銀河圖片素材。
+- 將 `boyvfv_is_dog.jpg` 移入 `static/boyvfv/`。
 - 新增 `.gitignore`，忽略 `.env`、虛擬環境、快取、產生圖片與本機設定。
 
 ### LINE 圖片路徑
 
 - `銀河`、`抽`、`rolltest` 改用部署服務的 `/static/...` 絕對 URL。
+- `銀河` 改成從 `static/boyvfv/` 目錄隨機抽選圖片。
 - 支援 `APP_BASE_URL`、`PUBLIC_BASE_URL`、`RENDER_EXTERNAL_URL`、`RENDER_EXTERNAL_HOSTNAME` 與 request host fallback。
+
+### LINE 圖片上傳
+
+- 新增 `static/line_uploads/` 目錄。
+- 新增 `上傳圖片` 指令，呼叫後 1 分鐘內同一聊天室的下一張圖片會存入 `static/line_uploads/`。
+- 上傳指令可透過 `LINE_IMAGE_UPLOAD_COMMAND` 覆蓋。
+- 上傳等待秒數可透過 `LINE_IMAGE_UPLOAD_WINDOW_SECONDS` 覆蓋。
 
 ### OpenAI 調整
 

@@ -39,7 +39,7 @@ MAX_HISTORY_MESSAGES = env_int("OPENAI_HISTORY_LIMIT", 20)
 
 SYSTEM_INSTRUCTIONS = os.getenv(
     "OPENAI_SYSTEM_PROMPT",
-    "模仿TWITCH實況主'超負荷'說話口吻用字，把你當人他本人，使用繁體中文回答。",
+    "使用繁體中文回答。",
 )
 
 messages = []

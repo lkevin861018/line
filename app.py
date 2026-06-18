@@ -1,12 +1,15 @@
 import json
 import os
 import random as rd
+import time
+import uuid
+from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import ImageSendMessage, MessageEvent, TextMessage, TextSendMessage
+from linebot.models import ImageMessage, ImageSendMessage, MessageEvent, TextMessage, TextSendMessage
 from openai import BadRequestError
 
 import ggopenai
@@ -20,6 +23,23 @@ line_secret = os.getenv("line_secret") or os.getenv("LINE_CHANNEL_SECRET")
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_token)
 handler = WebhookHandler(line_secret)
+
+
+def env_int(name, default):
+    try:
+        return max(0, int(os.getenv(name, default)))
+    except ValueError:
+        return default
+
+
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+BOYVFV_DIR = STATIC_DIR / "boyvfv"
+LINE_UPLOAD_DIR = STATIC_DIR / "line_uploads"
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+UPLOAD_COMMAND = os.getenv("LINE_IMAGE_UPLOAD_COMMAND", "上傳圖片")
+UPLOAD_WINDOW_SECONDS = env_int("LINE_IMAGE_UPLOAD_WINDOW_SECONDS", 60)
+upload_sessions = {}
 
 
 def public_base_url():
@@ -48,6 +68,60 @@ def image_message(static_path):
         original_content_url=image_url,
         preview_image_url=image_url,
     )
+
+
+def random_static_image(directory, static_prefix):
+    images = [
+        path
+        for path in directory.iterdir()
+        if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS
+    ]
+    if not images:
+        return None
+
+    selected = rd.choice(images)
+    return f"{static_prefix}/{selected.name}"
+
+
+def source_key(event):
+    source = event.source
+    return (
+        getattr(source, "group_id", None)
+        or getattr(source, "room_id", None)
+        or getattr(source, "user_id", None)
+        or "unknown"
+    )
+
+
+def begin_upload_session(event):
+    upload_sessions[source_key(event)] = time.time() + UPLOAD_WINDOW_SECONDS
+
+
+def consume_upload_session(event):
+    key = source_key(event)
+    expires_at = upload_sessions.get(key)
+    if not expires_at:
+        return False
+
+    if time.time() > expires_at:
+        upload_sessions.pop(key, None)
+        return False
+
+    upload_sessions.pop(key, None)
+    return True
+
+
+def save_line_image(message_id):
+    LINE_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    file_name = f"{time.strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex}.jpg"
+    output_path = LINE_UPLOAD_DIR / file_name
+
+    message_content = line_bot_api.get_message_content(message_id)
+    with output_path.open("wb") as image_file:
+        for chunk in message_content.iter_content():
+            image_file.write(chunk)
+
+    return f"line_uploads/{file_name}"
 
 
 @app.route("/index", methods=["GET", "POST"])
@@ -81,16 +155,38 @@ def callback():
     return "OK"
 
 
-@handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent, message=(TextMessage, ImageMessage))
 def handle_message(event):
-    text = event.message.text.strip()
     message = None
 
+    if isinstance(event.message, ImageMessage):
+        if consume_upload_session(event):
+            try:
+                static_path = save_line_image(event.message.id)
+                message = TextSendMessage(text=f"圖片已儲存：static/{static_path}")
+            except Exception as exc:
+                app.logger.exception("LINE image upload failed: %s", exc)
+                message = TextSendMessage(text="圖片儲存失敗，請再試一次")
+        else:
+            return
+
+        line_bot_api.reply_message(event.reply_token, message)
+        return
+
+    text = event.message.text.strip()
+
     if text == "銀河":
-        message = image_message("boyvfv_is_dog.jpg")
+        static_path = random_static_image(BOYVFV_DIR, "boyvfv")
+        if static_path:
+            message = image_message(static_path)
+        else:
+            message = TextSendMessage(text="目前沒有銀河圖片")
     elif text == "抽":
         random_num = rd.randint(1, 134)
         message = image_message(f"roll/{random_num}_line.png")
+    elif text == UPLOAD_COMMAND:
+        begin_upload_session(event)
+        message = TextSendMessage(text="請在 1 分鐘內傳送要儲存的圖片")
     elif text.startswith("rolltest"):
         test_num = text[len("rolltest") :].strip()
         if not test_num.isdigit():
