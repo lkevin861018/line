@@ -34,7 +34,9 @@
 
 ### OpenAI 調整
 
-- `@GG人` 改用 OpenAI Responses API 的 message list，不再將聊天歷史串成單一文字。
+- `@GG人` 改用 Grok Responses API，API key 由 `.env` 的 `GROK_API_KEY` 提供。
+- `@GG人畫圖` 與 `@GG人改圖` 維持使用 OpenAI 圖像 API。
+- `@GG人` 使用 Responses API 的 message list，不再將聊天歷史串成單一文字。
 - 預設聊天模型改成 `gpt-5.5`，可透過 `OPENAI_CHAT_MODEL` 覆蓋。
 - 系統提示改成繁體中文、自然、簡潔、友善，適合 LINE 群組聊天。
 - OpenAI client 改成 lazy initialization，服務啟動不依賴 OpenAI key 立即存在。

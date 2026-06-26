@@ -11,6 +11,7 @@ from openai import OpenAI
 load_dotenv()
 
 _client = None
+_grok_client = None
 
 
 def openai_client():
@@ -22,6 +23,25 @@ def openai_client():
     return _client
 
 
+def grok_client():
+    global _grok_client
+
+    if _grok_client is None:
+        _grok_client = OpenAI(
+            api_key=grok_api_key(),
+            base_url=GROK_BASE_URL,
+        )
+    return _grok_client
+
+
+def grok_api_key():
+    api_key = os.getenv("GROK_API_KEY") or os.getenv("XAI_API_KEY")
+    if api_key:
+        return api_key.strip()
+
+    raise RuntimeError("Grok API key not found. Set GROK_API_KEY in .env or environment variables.")
+
+
 def env_int(name, default):
     try:
         return max(0, int(os.getenv(name, default)))
@@ -29,7 +49,9 @@ def env_int(name, default):
         return default
 
 
-DEFAULT_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL", "gpt-5.5")
+BASE_DIR = Path(__file__).resolve().parent
+GROK_BASE_URL = "https://api.x.ai/v1"
+DEFAULT_GROK_MODEL = os.getenv("GROK_MODEL", "grok-4.3")
 DEFAULT_IMAGE_MODEL = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
 DEFAULT_IMAGE_SIZE = os.getenv("OPENAI_IMAGE_SIZE", "1024x1024")
 DEFAULT_IMAGE_QUALITY = os.getenv("OPENAI_IMAGE_QUALITY", "auto")
@@ -39,7 +61,7 @@ MAX_HISTORY_MESSAGES = env_int("OPENAI_HISTORY_LIMIT", 20)
 
 SYSTEM_INSTRUCTIONS = os.getenv(
     "OPENAI_SYSTEM_PROMPT",
-    "使用繁體中文回答。",
+    "使用繁體中文回答。你是我的摯友，喜歡講垃圾話，很無厘頭，不需要給我情緒價值，並且充滿特種歧視言論。",
 )
 
 messages = []
@@ -48,14 +70,14 @@ messages = []
 def cgpt(ask, gen=None):
     global messages
 
-    model = gen or DEFAULT_CHAT_MODEL
+    model = gen or DEFAULT_GROK_MODEL
     input_messages = messages + [{"role": "user", "content": ask}]
-    response = openai_client().responses.create(
+    response = grok_client().responses.create(
         model=model,
-        instructions=SYSTEM_INSTRUCTIONS,
-        input=input_messages,
-        reasoning={"effort": DEFAULT_REASONING_EFFORT},
-        text={"verbosity": DEFAULT_TEXT_VERBOSITY},
+        input=[
+            {"role": "system", "content": SYSTEM_INSTRUCTIONS},
+            *input_messages,
+        ],
     )
 
     answer = response.output_text.strip()
@@ -80,7 +102,7 @@ def igpt(req, output_dir=None):
     image_data = image_completion.data[0]
     image_bytes = _image_bytes(image_data)
 
-    static_root = Path(__file__).resolve().parent / "static"
+    static_root = BASE_DIR / "static"
     generated_dir = Path(output_dir) if output_dir else static_root / "generated"
     generated_dir.mkdir(parents=True, exist_ok=True)
 
@@ -106,7 +128,7 @@ def edit_image(image_path, prompt, output_dir=None):
     image_data = image_completion.data[0]
     image_bytes = _image_bytes(image_data)
 
-    static_root = Path(__file__).resolve().parent / "static"
+    static_root = BASE_DIR / "static"
     edited_dir = Path(output_dir) if output_dir else static_root / "改圖"
     edited_dir.mkdir(parents=True, exist_ok=True)
 
