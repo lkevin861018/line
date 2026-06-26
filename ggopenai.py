@@ -1,5 +1,6 @@
 import base64
 import os
+import time
 import uuid
 from pathlib import Path
 
@@ -50,7 +51,10 @@ def env_int(name, default):
 
 
 BASE_DIR = Path(__file__).resolve().parent
-PROMPT_FILE = BASE_DIR / "prompt.txt"
+GOOGLE_PROMPT_DOC_ID = "1eqIA-itJ7MvGSu0hF_8BAgnVqBq--81S9SMsHi5SLII"
+GOOGLE_PROMPT_EXPORT_URL = (
+    f"https://docs.google.com/document/d/{GOOGLE_PROMPT_DOC_ID}/export?format=txt"
+)
 GROK_BASE_URL = "https://api.x.ai/v1"
 DEFAULT_GROK_MODEL = os.getenv("GROK_MODEL", "grok-4.3")
 GROK_WEB_SEARCH_ENABLED = os.getenv("GROK_WEB_SEARCH_ENABLED", "true").lower() not in {
@@ -65,19 +69,42 @@ DEFAULT_IMAGE_QUALITY = os.getenv("OPENAI_IMAGE_QUALITY", "auto")
 DEFAULT_REASONING_EFFORT = os.getenv("OPENAI_REASONING_EFFORT", "low")
 DEFAULT_TEXT_VERBOSITY = os.getenv("OPENAI_TEXT_VERBOSITY", "medium")
 MAX_HISTORY_MESSAGES = env_int("OPENAI_HISTORY_LIMIT", 20)
+PROMPT_CACHE_SECONDS = env_int("GOOGLE_PROMPT_CACHE_SECONDS", 300)
+PROMPT_FETCH_TIMEOUT_SECONDS = env_int("GOOGLE_PROMPT_FETCH_TIMEOUT_SECONDS", 10)
 
 messages = []
+_prompt_cache = {
+    "content": None,
+    "fetched_at": 0.0,
+}
 
 
 def system_instructions():
-    if not PROMPT_FILE.exists():
-        raise RuntimeError("prompt.txt not found")
+    now = time.time()
+    cached_prompt = _prompt_cache["content"]
+    cache_age = now - _prompt_cache["fetched_at"]
+    if cached_prompt and cache_age < PROMPT_CACHE_SECONDS:
+        return cached_prompt
 
-    prompt = PROMPT_FILE.read_text(encoding="utf-8").strip()
-    if not prompt:
-        raise RuntimeError("prompt.txt is empty")
+    try:
+        response = requests.get(GOOGLE_PROMPT_EXPORT_URL, timeout=PROMPT_FETCH_TIMEOUT_SECONDS)
+        response.raise_for_status()
+        prompt = response.text.strip()
+        if not prompt or looks_like_html(prompt):
+            raise ValueError("Google document export did not return plain text")
+    except (requests.RequestException, ValueError) as exc:
+        if cached_prompt:
+            return cached_prompt
+        raise RuntimeError("Failed to load prompt from Google document") from exc
 
+    _prompt_cache["content"] = prompt
+    _prompt_cache["fetched_at"] = now
     return prompt
+
+
+def looks_like_html(text):
+    lowered = text.lstrip().lower()
+    return lowered.startswith("<!doctype html") or lowered.startswith("<html")
 
 
 def cgpt(ask, gen=None):

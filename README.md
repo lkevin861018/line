@@ -30,7 +30,8 @@
 | `OPENAI_REASONING_EFFORT` | 聊天推理強度，預設 `low` |
 | `OPENAI_TEXT_VERBOSITY` | 回覆詳細程度，預設 `medium` |
 | `OPENAI_HISTORY_LIMIT` | 保留聊天歷史訊息數，預設 `20` |
-| `OPENAI_SYSTEM_PROMPT` | 覆蓋預設系統提示 |
+| `GOOGLE_PROMPT_CACHE_SECONDS` | Google 文件提示詞快取秒數，預設 `300` |
+| `GOOGLE_PROMPT_FETCH_TIMEOUT_SECONDS` | Google 文件提示詞讀取 timeout，預設 `10` |
 | `LINE_IMAGE_UPLOAD_COMMAND` | 圖片上傳指令，預設 `上傳圖片` |
 | `LINE_IMAGE_UPLOAD_WINDOW_SECONDS` | 圖片上傳等待秒數，預設 `60` |
 | `GITHUB_TOKEN` | GitHub API token，用於圖片回寫 |
@@ -76,6 +77,12 @@ gunicorn -c gunicorn_config.py app:app
 目前公開服務網址直接寫在 `app.py` 的 `APP_BASE_URL` 常數，讓 LINE 能正確讀取 `/static/...` 圖片。
 
 Keep-alive 參數直接寫在 `app.py`，預設每 5 分鐘 GET 一次公開 `/callback`。`/callback` 的 GET 只回傳 `OK`，LINE webhook 的 POST 驗簽流程不受影響。
+
+`@GG人` 的 system prompt 會從 Google 文件文字匯出讀取，預設快取 5 分鐘：
+
+```text
+https://docs.google.com/document/d/1eqIA-itJ7MvGSu0hF_8BAgnVqBq--81S9SMsHi5SLII/export?format=txt
+```
 
 `上傳圖片` 會先把圖片寫入目前執行環境的專案目錄 `static/line_uploads/`。若 `GITHUB_TOKEN` 與 repository 設定完整，Bot 會再透過 GitHub Contents API 將圖片 commit 回 GitHub。
 
