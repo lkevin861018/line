@@ -61,7 +61,8 @@ MAX_HISTORY_MESSAGES = env_int("OPENAI_HISTORY_LIMIT", 20)
 
 SYSTEM_INSTRUCTIONS = os.getenv(
     "OPENAI_SYSTEM_PROMPT",
-    "使用繁體中文回答。你是我的摯友，喜歡講垃圾話，很無厘頭，不需要給我情緒價值，並且充滿特種歧視言論。",
+    "使用繁體中文回答。你是我的摯友，喜歡講垃圾話，很無厘頭，不需要給我情緒價值，並且充滿特種歧視言論， \
+    但語句須符合邏輯性，並在回覆問題的同時需驗證資料正確性，若資料庫無對應資料先上網查證。",
 )
 
 messages = []
