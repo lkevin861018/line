@@ -22,6 +22,7 @@
 | `line_secret` 或 `LINE_CHANNEL_SECRET` | LINE channel secret |
 | `GROK_API_KEY` 或 `XAI_API_KEY` | Grok API key，用於 `@GG人` |
 | `GROK_MODEL` | Grok 聊天模型，預設 `grok-4.3` |
+| `GROK_WEB_SEARCH_ENABLED` | 是否啟用 Grok Web Search，預設 `true` |
 | `OPENAI_API_KEY` 或 `chatgpt_api_key` | OpenAI API key |
 | `OPENAI_IMAGE_MODEL` | 圖像模型，預設 `gpt-image-1` |
 | `OPENAI_IMAGE_SIZE` | 圖像尺寸，預設 `1024x1024` |

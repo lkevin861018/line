@@ -35,6 +35,7 @@
 ### OpenAI 調整
 
 - `@GG人` 改用 Grok Responses API，API key 由 `.env` 的 `GROK_API_KEY` 提供。
+- `@GG人` 啟用 Grok Web Search tool，讓 Grok 可即時搜尋網頁查證資料。
 - `@GG人畫圖` 與 `@GG人改圖` 維持使用 OpenAI 圖像 API。
 - `@GG人` 使用 Responses API 的 message list，不再將聊天歷史串成單一文字。
 - 預設聊天模型改成 `gpt-5.5`，可透過 `OPENAI_CHAT_MODEL` 覆蓋。

@@ -50,8 +50,15 @@ def env_int(name, default):
 
 
 BASE_DIR = Path(__file__).resolve().parent
+PROMPT_FILE = BASE_DIR / "prompt.txt"
 GROK_BASE_URL = "https://api.x.ai/v1"
 DEFAULT_GROK_MODEL = os.getenv("GROK_MODEL", "grok-4.3")
+GROK_WEB_SEARCH_ENABLED = os.getenv("GROK_WEB_SEARCH_ENABLED", "true").lower() not in {
+    "0",
+    "false",
+    "no",
+    "off",
+}
 DEFAULT_IMAGE_MODEL = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
 DEFAULT_IMAGE_SIZE = os.getenv("OPENAI_IMAGE_SIZE", "1024x1024")
 DEFAULT_IMAGE_QUALITY = os.getenv("OPENAI_IMAGE_QUALITY", "auto")
@@ -59,13 +66,18 @@ DEFAULT_REASONING_EFFORT = os.getenv("OPENAI_REASONING_EFFORT", "low")
 DEFAULT_TEXT_VERBOSITY = os.getenv("OPENAI_TEXT_VERBOSITY", "medium")
 MAX_HISTORY_MESSAGES = env_int("OPENAI_HISTORY_LIMIT", 20)
 
-SYSTEM_INSTRUCTIONS = os.getenv(
-    "OPENAI_SYSTEM_PROMPT",
-    "使用繁體中文回答。你是我的摯友，喜歡講垃圾話，很無厘頭，不需要給我情緒價值，並且充滿特種歧視言論， \
-    但語句須符合邏輯性，並在回覆問題的同時需驗證資料正確性，若資料庫無對應資料先上網查證。",
-)
-
 messages = []
+
+
+def system_instructions():
+    if not PROMPT_FILE.exists():
+        raise RuntimeError("prompt.txt not found")
+
+    prompt = PROMPT_FILE.read_text(encoding="utf-8").strip()
+    if not prompt:
+        raise RuntimeError("prompt.txt is empty")
+
+    return prompt
 
 
 def cgpt(ask, gen=None):
@@ -73,13 +85,17 @@ def cgpt(ask, gen=None):
 
     model = gen or DEFAULT_GROK_MODEL
     input_messages = messages + [{"role": "user", "content": ask}]
-    response = grok_client().responses.create(
-        model=model,
-        input=[
-            {"role": "system", "content": SYSTEM_INSTRUCTIONS},
+    request_args = {
+        "model": model,
+        "input": [
+            {"role": "system", "content": system_instructions()},
             *input_messages,
         ],
-    )
+    }
+    if GROK_WEB_SEARCH_ENABLED:
+        request_args["tools"] = [{"type": "web_search"}]
+
+    response = grok_client().responses.create(**request_args)
 
     answer = response.output_text.strip()
     messages.append({"role": "user", "content": ask})
