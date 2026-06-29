@@ -12,7 +12,6 @@ from openai import OpenAI
 load_dotenv()
 
 _client = None
-_grok_client = None
 
 
 def openai_client():
@@ -22,25 +21,6 @@ def openai_client():
         api_key = os.getenv("OPENAI_API_KEY") or os.getenv("chatgpt_api_key")
         _client = OpenAI(api_key=api_key) if api_key else OpenAI()
     return _client
-
-
-def grok_client():
-    global _grok_client
-
-    if _grok_client is None:
-        _grok_client = OpenAI(
-            api_key=grok_api_key(),
-            base_url=GROK_BASE_URL,
-        )
-    return _grok_client
-
-
-def grok_api_key():
-    api_key = os.getenv("GROK_API_KEY") or os.getenv("XAI_API_KEY")
-    if api_key:
-        return api_key.strip()
-
-    raise RuntimeError("Grok API key not found. Set GROK_API_KEY in .env or environment variables.")
 
 
 def env_int(name, default):
@@ -55,14 +35,7 @@ GOOGLE_PROMPT_DOC_ID = "1eqIA-itJ7MvGSu0hF_8BAgnVqBq--81S9SMsHi5SLII"
 GOOGLE_PROMPT_EXPORT_URL = (
     f"https://docs.google.com/document/d/{GOOGLE_PROMPT_DOC_ID}/export?format=txt"
 )
-GROK_BASE_URL = "https://api.x.ai/v1"
-DEFAULT_GROK_MODEL = os.getenv("GROK_MODEL", "grok-4.3")
-GROK_WEB_SEARCH_ENABLED = os.getenv("GROK_WEB_SEARCH_ENABLED", "true").lower() not in {
-    "0",
-    "false",
-    "no",
-    "off",
-}
+DEFAULT_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL", "gpt-5.5")
 DEFAULT_IMAGE_MODEL = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
 DEFAULT_IMAGE_SIZE = os.getenv("OPENAI_IMAGE_SIZE", "1024x1024")
 DEFAULT_IMAGE_QUALITY = os.getenv("OPENAI_IMAGE_QUALITY", "auto")
@@ -110,7 +83,7 @@ def looks_like_html(text):
 def cgpt(ask, gen=None):
     global messages
 
-    model = gen or DEFAULT_GROK_MODEL
+    model = gen or DEFAULT_CHAT_MODEL
     input_messages = messages + [{"role": "user", "content": ask}]
     request_args = {
         "model": model,
@@ -118,11 +91,11 @@ def cgpt(ask, gen=None):
             {"role": "system", "content": system_instructions()},
             *input_messages,
         ],
+        "reasoning": {"effort": DEFAULT_REASONING_EFFORT},
+        "text": {"verbosity": DEFAULT_TEXT_VERBOSITY},
     }
-    if GROK_WEB_SEARCH_ENABLED:
-        request_args["tools"] = [{"type": "web_search"}]
 
-    response = grok_client().responses.create(**request_args)
+    response = openai_client().responses.create(**request_args)
 
     answer = response.output_text.strip()
     messages.append({"role": "user", "content": ask})

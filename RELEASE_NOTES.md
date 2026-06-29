@@ -1,5 +1,14 @@
 # Release Notes
 
+## 2026-06-29
+
+### ChatGPT 聊天模型
+
+- `@GG人` 從 Grok 切回 OpenAI Responses API。
+- 預設聊天模型維持 `gpt-5.5`，可透過 `OPENAI_CHAT_MODEL` 覆蓋。
+- 移除 `@GG人` 對 Grok API key、Grok model 與 Grok Web Search 設定的依賴。
+- `@GG人畫圖` 與 `@GG人改圖` 維持使用 OpenAI 圖像 API。
+
 ## 2026-06-18
 
 ### 專案整理
@@ -34,8 +43,7 @@
 
 ### OpenAI 調整
 
-- `@GG人` 改用 Grok Responses API，API key 由 `.env` 的 `GROK_API_KEY` 提供。
-- `@GG人` 啟用 Grok Web Search tool，讓 Grok 可即時搜尋網頁查證資料。
+- `@GG人` 使用 OpenAI Responses API，API key 由 `.env` 的 `OPENAI_API_KEY` 或 `chatgpt_api_key` 提供。
 - `@GG人` 的 system prompt 改由 Google 文件文字匯出讀取，不再依賴 `prompt.txt`。
 - Google 文件提示詞預設快取 5 分鐘，讀取失敗時會沿用記憶體中的上一版提示詞。
 - `@GG人畫圖` 與 `@GG人改圖` 維持使用 OpenAI 圖像 API。

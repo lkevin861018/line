@@ -8,7 +8,7 @@
 - `抽`：隨機回傳 `static/roll/{1..134}_line.png`
 - `rolltest <編號>`：回傳指定 `static/roll/<編號>_line.png`
 - `上傳圖片`：開啟 1 分鐘上傳窗口，下一張圖片會存到 `static/line_uploads/`
-- `@GG人 <內容>`：使用 Grok Responses API 回覆聊天內容
+- `@GG人 <內容>`：使用 OpenAI Responses API 與最新 ChatGPT 模型回覆聊天內容
 - `@GG人畫圖 <內容>`：使用 GPT Image 生成圖片，儲存在 `static/generated/` 後回傳圖片 URL
 - `@GG人改圖 <指令>`：開啟 1 分鐘改圖窗口，下一張圖片會依指令修改，結果存到 `static/改圖/` 並同步 GitHub
 
@@ -20,10 +20,8 @@
 | --- | --- |
 | `line_token` 或 `LINE_CHANNEL_ACCESS_TOKEN` | LINE channel access token |
 | `line_secret` 或 `LINE_CHANNEL_SECRET` | LINE channel secret |
-| `GROK_API_KEY` 或 `XAI_API_KEY` | Grok API key，用於 `@GG人` |
-| `GROK_MODEL` | Grok 聊天模型，預設 `grok-4.3` |
-| `GROK_WEB_SEARCH_ENABLED` | 是否啟用 Grok Web Search，預設 `true` |
 | `OPENAI_API_KEY` 或 `chatgpt_api_key` | OpenAI API key |
+| `OPENAI_CHAT_MODEL` | ChatGPT 聊天模型，預設 `gpt-5.5` |
 | `OPENAI_IMAGE_MODEL` | 圖像模型，預設 `gpt-image-1` |
 | `OPENAI_IMAGE_SIZE` | 圖像尺寸，預設 `1024x1024` |
 | `OPENAI_IMAGE_QUALITY` | 圖像品質，預設 `auto` |
