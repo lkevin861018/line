@@ -97,6 +97,21 @@ def source_key(event):
     )
 
 
+def event_user_id(event):
+    return getattr(event.source, "user_id", None) or "UnknownUser"
+
+
+def log_incoming_message(event):
+    if isinstance(event.message, TextMessage):
+        content = event.message.text
+    elif isinstance(event.message, ImageMessage):
+        content = "[ImageMessage]"
+    else:
+        content = f"[{event.message.type}]"
+
+    print(f"[LINE MESSAGE] UserID={event_user_id(event)} Content={content}", flush=True)
+
+
 def begin_upload_session(event):
     key = source_key(event)
     image_edit_sessions.pop(key, None)
@@ -261,6 +276,7 @@ def callback():
 @handler.add(MessageEvent, message=(TextMessage, ImageMessage))
 def handle_message(event):
     message = None
+    log_incoming_message(event)
 
     if isinstance(event.message, ImageMessage):
         edit_prompt = consume_image_edit_session(event)
