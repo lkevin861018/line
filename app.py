@@ -1,6 +1,7 @@
 import json
 import os
 import random as rd
+import re
 import tempfile
 import threading
 import time
@@ -13,11 +14,15 @@ from dotenv import load_dotenv
 from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import ImageMessage, ImageSendMessage, MessageEvent, TextMessage, TextSendMessage
+from linebot.models import (
+    FollowEvent, ImageMessage, ImageSendMessage, MessageEvent, PostbackEvent,
+    TextMessage, TextSendMessage,
+)
 from openai import BadRequestError
 
 import github_api
 import ggopenai
+import line_ui
 
 
 load_dotenv()
@@ -40,6 +45,7 @@ def env_int(name, default):
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 BOYVFV_DIR = STATIC_DIR / "boyvfv"
+ROLL_DIR = STATIC_DIR / "roll"
 LINE_UPLOAD_DIR = STATIC_DIR / "line_uploads"
 IMAGE_EDIT_DIR = STATIC_DIR / "改圖"
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
@@ -74,17 +80,60 @@ def image_message(static_path):
     )
 
 
-def random_static_image(directory, static_prefix):
+def static_images(directory, *, numbered=False):
+    if not directory.is_dir():
+        return []
+
     images = [
         path
         for path in directory.iterdir()
         if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS
+        and (not numbered or re.fullmatch(r"[1-9]\d*_line\.png", path.name))
     ]
-    if not images:
-        return None
+    return sorted(
+        images,
+        key=lambda path: [
+            (1, int(part)) if part.isdigit() else (0, part.casefold())
+            for part in re.split(r"(\d+)", path.name)
+        ],
+    )
 
-    selected = rd.choice(images)
-    return f"{static_prefix}/{selected.name}"
+
+def gallery_images(category):
+    if category == "roll":
+        return static_images(ROLL_DIR, numbered=True)
+    if category == "boyvfv":
+        return static_images(BOYVFV_DIR)
+    return []
+
+
+def gallery_message(category, *, filename=None, direction="random"):
+    images = gallery_images(category)
+    label = "抽圖" if category == "roll" else "銀河"
+    if not images:
+        return TextSendMessage(text=f"目前沒有{label}圖片")
+
+    if direction == "random":
+        selected = rd.choice(images)
+    else:
+        current = next((i for i, path in enumerate(images) if path.name == filename), None)
+        if current is None:
+            return TextSendMessage(text="這張圖片已不存在，請重新抽圖")
+        offset = {"previous": -1, "next": 1, "current": 0}[direction]
+        selected = images[(current + offset) % len(images)]
+
+    return [
+        image_message(f"{category}/{selected.name}"),
+        line_ui.image_controls(category, selected.name, images.index(selected) + 1, len(images)),
+    ]
+
+
+def reply(event, message, *, choose_image=False):
+    messages = message if isinstance(message, list) else [message]
+    messages[-1].quick_reply = line_ui.feature_quick_reply(
+        UPLOAD_COMMAND, choose_image=choose_image,
+    )
+    line_bot_api.reply_message(event.reply_token, messages)
 
 
 def source_key(event):
@@ -273,9 +322,43 @@ def callback():
     return "OK"
 
 
+@handler.add(FollowEvent)
+def handle_follow(event):
+    reply(event, line_ui.feature_menu(UPLOAD_COMMAND))
+
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    try:
+        data = json.loads(event.postback.data)
+    except (json.JSONDecodeError, TypeError):
+        data = None
+
+    if isinstance(data, dict):
+        if data.get("action") == "prompt":
+            command = data.get("command")
+            if isinstance(command, str) and command in line_ui.PROMPT_COMMANDS:
+                reply(event, TextSendMessage(text=line_ui.PROMPT_COMMANDS[command][2]))
+                return
+        elif data.get("action") == "browse":
+            category = data.get("category")
+            direction = data.get("direction")
+            filename = data.get("file")
+            if (
+                category in ("roll", "boyvfv")
+                and direction in ("previous", "next", "random")
+                and isinstance(filename, str)
+            ):
+                reply(event, gallery_message(category, filename=filename, direction=direction))
+                return
+
+    reply(event, TextSendMessage(text="操作已失效，請輸入「選單」重新選擇功能"))
+
+
 @handler.add(MessageEvent, message=(TextMessage, ImageMessage))
 def handle_message(event):
     message = None
+    choose_image = False
     log_incoming_message(event)
 
     if isinstance(event.message, ImageMessage):
@@ -330,36 +413,35 @@ def handle_message(event):
         else:
             return
 
-        line_bot_api.reply_message(event.reply_token, message)
+        reply(event, message)
         return
 
     text = event.message.text.strip()
 
-    if text == "銀河":
-        static_path = random_static_image(BOYVFV_DIR, "boyvfv")
-        if static_path:
-            message = image_message(static_path)
-        else:
-            message = TextSendMessage(text="目前沒有銀河圖片")
+    if text.lower() in ("選單", "功能", "功能選單", "幫助", "menu"):
+        message = line_ui.feature_menu(UPLOAD_COMMAND)
+    elif text == "銀河":
+        message = gallery_message("boyvfv")
     elif text == "抽":
-        random_num = rd.randint(1, 134)
-        message = image_message(f"roll/{random_num}_line.png")
+        message = gallery_message("roll")
     elif text == UPLOAD_COMMAND: # 上傳圖片
         begin_upload_session(event)
-        message = TextSendMessage(text="請在 1 分鐘內傳送要儲存的圖片")
+        message = TextSendMessage(text=f"請在 {UPLOAD_WINDOW_SECONDS} 秒內傳送要儲存的圖片")
+        choose_image = True
     elif text.startswith(IMAGE_EDIT_COMMAND):
         prompt = text[len(IMAGE_EDIT_COMMAND) :].strip()
         if not prompt:
             message = TextSendMessage(text="請輸入改圖指令，例如：@GG人改圖 把背景改成海邊")
         else:
             begin_image_edit_session(event, prompt)
-            message = TextSendMessage(text="請在 1 分鐘內傳送要修改的圖片")
+            message = TextSendMessage(text=f"請在 {UPLOAD_WINDOW_SECONDS} 秒內傳送要修改的圖片")
+            choose_image = True
     elif text.startswith("rolltest"):
         test_num = text[len("rolltest") :].strip()
         if not test_num.isdigit():
             message = TextSendMessage(text="請輸入 rolltest 編號，例如：rolltest 1")
         else:
-            message = image_message(f"roll/{test_num}_line.png")
+            message = gallery_message("roll", filename=f"{test_num}_line.png", direction="current")
     elif text.startswith("@GG人畫圖"):
         prompt = text[len("@GG人畫圖") :].strip()
         if not prompt:
@@ -385,7 +467,7 @@ def handle_message(event):
                 message = TextSendMessage(text="回覆失敗，晚點再試一次")
 
     if message:
-        line_bot_api.reply_message(event.reply_token, message)
+        reply(event, message, choose_image=choose_image)
 
 
 start_keep_alive()

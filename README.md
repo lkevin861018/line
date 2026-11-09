@@ -1,12 +1,38 @@
 # LINE Bot
 
-這是一個部署在 Render 的 LINE Bot 專案，保留必要 LINE webhook、抽圖、指定抽圖、銀河圖、LINE 圖片上傳、OpenAI 聊天與 GPT 圖像生成功能。
+這是一個部署在 Render 的 LINE Bot 專案，提供 LINE 聊天室功能選單、圖片瀏覽、圖片上傳、OpenAI 聊天與 GPT 圖像生成、編輯功能。
+
+## 聊天室 GUI
+
+在 LINE 聊天室傳送 `選單`（也支援 `功能`、`功能選單`、`幫助`、`menu`），即可開啟功能卡片。加入好友或解除封鎖時也會顯示選單。
+
+每種功能都有獨立按鈕：
+
+| 按鈕 | 操作 |
+| --- | --- |
+| 隨機抽圖 | 直接隨機抽出一張圖 |
+| 銀河圖片 | 直接隨機抽出一張銀河圖 |
+| 指定抽圖 | 預填 `rolltest `，輸入圖片編號後送出 |
+| 上傳圖片 | 開啟上傳窗口，再按「選擇圖片」從相簿選圖 |
+| AI 聊天 | 預填 `@GG人 `，輸入問題後送出 |
+| AI 畫圖 | 預填 `@GG人畫圖 `，輸入畫面描述後送出 |
+| AI 改圖 | 預填 `@GG人改圖 `，輸入修改指令後送出，再依提示選圖 |
+
+Bot 回覆會附上功能快捷按鈕。功能卡片保留在聊天紀錄，可隨時點選。鍵盤預填與快捷按鈕的支援範圍依 LINE 用戶端版本而定；未支援時可依回覆中的範例輸入指令。參考 LINE 官方的[動作說明](https://developers.line.biz/en/docs/messaging-api/actions/)與[快捷按鈕說明](https://developers.line.biz/en/docs/messaging-api/using-quick-reply/)。
+
+`抽`、`銀河` 和 `rolltest <編號>` 回傳的圖片下方都有瀏覽卡片：
+
+- **上一張／下一張**：依檔名中的數字順序瀏覽同一圖庫，例如 `1 → 2 → 10`；第一張往前回到最後一張，最後一張往後回到第一張。
+- **重新抽圖**：在同一圖庫重新隨機抽選，可能再次抽到同一張。
+- **功能選單**：回到全部功能。
+
+每張瀏覽卡片都記錄自己的圖庫與圖片檔名，不依賴伺服器記憶體中的瀏覽位置。即使另一位群組成員也在抽圖，或重新啟動服務，舊卡片仍會從原本那張圖片繼續瀏覽。圖片遭移除或圖庫為空時會回覆提示。
 
 ## 功能
 
 - `銀河`：隨機回傳 `static/boyvfv/` 目錄中的圖片
-- `抽`：隨機回傳 `static/roll/{1..134}_line.png`
-- `rolltest <編號>`：回傳指定 `static/roll/<編號>_line.png`
+- `抽`：從 `static/roll/` 實際存在的正整數編號 `*_line.png` 圖片隨機抽選，目前有 1～134 張
+- `rolltest <編號>`：回傳指定 `static/roll/<編號>_line.png`，編號不存在時回覆提示
 - `上傳圖片`：開啟 1 分鐘上傳窗口，下一張圖片會存到 `static/line_uploads/`
 - `@GG人 <內容>`：使用 OpenAI Responses API 與最新 ChatGPT 模型回覆聊天內容
 - `@GG人畫圖 <內容>`：使用 GPT Image 生成圖片，儲存在 `static/generated/` 後回傳圖片 URL
@@ -96,14 +122,24 @@ GitHub token 權限建議：
 語法檢查：
 
 ```powershell
-.\.venv\Scripts\python.exe -m compileall app.py ggopenai.py gunicorn_config.py
+.\.venv\Scripts\python.exe -m compileall app.py line_ui.py ggopenai.py github_api.py gunicorn_config.py
 ```
+
+聊天室與圖片瀏覽測試（模擬外部 API，不會呼叫 LINE、OpenAI 或 GitHub）：
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+涵蓋已驗簽 webhook 的選單與 postback 分派、所有功能入口、數字排序、前後循環、舊卡片獨立瀏覽、銀河圖庫、單張／空圖庫、失效資料、指定編號不存在、相簿按鈕及原有 AI 指令分派。
 
 `.env` smoke test 會檢查 Flask route、LINE/OpenAI 環境變數是否載入、OpenAI 模組預設值與 `static/generated` 是否存在。測試時不要輸出 secret 值。
 
 ## 檔案說明
 
 - `app.py`：Flask app、LINE webhook、LINE 指令處理
+- `line_ui.py`：聊天室功能選單、快捷按鈕、圖片瀏覽卡片
+- `tests/test_line_chat_ui.py`：本機 webhook 與圖片瀏覽回歸測試
 - `ggopenai.py`：OpenAI 聊天與圖像生成
 - `github_api.py`：GitHub Contents API 圖片回寫
 - `static/boyvfv/`：銀河圖片素材
